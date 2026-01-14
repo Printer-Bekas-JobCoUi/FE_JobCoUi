@@ -76,28 +76,24 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-b from-bg-primary to-bg-secondary border-r border-white/10">
-      {/* Header with gradient */}
-      <div className="h-20 flex items-center gap-3 px-5 border-b border-white/10 relative overflow-hidden">
-        {/* Background glow */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-accent/10 blur-2xl" />
-        
-        <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary to-secondary text-white grid place-items-center font-bold text-xl shadow-lg relative z-10 pulse-glow">
-          BH
+    <div className="h-full flex flex-col bg-slate-900 border-r border-slate-800 text-white">
+      {/* Header */}
+      <div className="h-16 flex items-center gap-3 px-6 border-b border-white/10">
+        <div className="h-10 w-10 bg-white rounded-full flex items-center justify-center overflow-hidden border-2 border-slate-700/50 shadow-sm shrink-0">
+          <img src="/jobcoui-logo.png" alt="Logo" className="h-7 w-auto object-contain" />
         </div>
-        <div className="min-w-0 relative z-10">
+        <div className="min-w-0">
           <div className="text-sm font-bold leading-4 truncate text-white">
-            Buruh Harian Lepas
+            JobCoUi
           </div>
-          <div className="text-xs text-cyan truncate flex items-center gap-1.5 font-medium">
-            <Sparkles className="h-3 w-3" />
+          <div className="text-xs text-slate-400 truncate font-medium">
             Admin Panel
           </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="p-4 overflow-y-auto flex-1">
+      <nav className="p-4 overflow-y-auto flex-1 space-y-1">
         {nav.map((item, idx) => {
           const prevSection = idx === 0 ? null : nav[idx - 1].section;
           const showSection = item.section && item.section !== prevSection;
@@ -109,7 +105,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           return (
             <React.Fragment key={item.to}>
               {showSection && (
-                <div className="px-3 pt-6 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                <div className="px-3 pt-5 pb-2 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
                   {item.section}
                 </div>
               )}
@@ -120,47 +116,30 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 onClick={onNavigate}
                 className={
                   isActive
-                    ? "group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-white mb-1.5 transition-all duration-300 relative overflow-hidden"
-                    : "group flex items-center gap-3 rounded-xl px-3 py-3 text-sm text-slate-400 mb-1.5 transition-all duration-300 hover:bg-white/5 hover:text-white"
-                }
-                style={
-                  isActive
-                    ? {
-                        background:
-                          "linear-gradient(135deg, rgba(102,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%)",
-                        borderLeft: "3px solid rgb(102 126 234)",
-                      }
-                    : undefined
+                    ? "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-blue-600 text-white shadow-md shadow-blue-900/20"
+                    : "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-all"
                 }
               >
-                {/* Glow effect on active */}
-                {isActive && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30 blur-xl -z-10" />
-                )}
-                
                 <span
                   className={
                     isActive
-                      ? "text-primary transition-colors"
-                      : "text-slate-500 group-hover:text-cyan transition-colors"
+                      ? "text-white"
+                      : "text-slate-500 group-hover:text-white transition-colors"
                   }
                 >
                   {item.icon}
                 </span>
                 <span className="truncate">{item.label}</span>
-                {isActive && (
-                  <div className="ml-auto h-2 w-2 rounded-full bg-cyan animate-pulse shadow-glow-cyan" />
-                )}
               </NavLink>
             </React.Fragment>
           );
         })}
       </nav>
       
-      {/* Footer with gradient */}
-      <div className="p-4 border-t border-white/10 bg-gradient-to-r from-primary/5 to-accent/5">
+      {/* Footer */}
+      <div className="p-4 border-t border-white/5 bg-slate-950/30">
         <div className="text-[10px] text-slate-500 text-center">
-          © 2026 • Modern Admin
+          © 2026 • Village Edition
         </div>
       </div>
     </div>

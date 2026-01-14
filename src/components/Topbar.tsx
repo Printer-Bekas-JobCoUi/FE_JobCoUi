@@ -29,7 +29,7 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
   }, [location.pathname])
 
   return (
-    <header className="sticky top-0 z-30 bg-bg-secondary/95 backdrop-blur-xl border-b border-white/10">
+    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-slate-200">
       <div className="px-4 sm:px-6 lg:px-8 h-16 flex items-center gap-4">
         <button
           className="lg:hidden btn-secondary px-2.5 py-2.5"
@@ -41,9 +41,9 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
         </button>
 
         <div className="min-w-0">
-          <div className="text-base font-bold text-white leading-5 truncate">{header.title}</div>
+          <div className="text-base font-bold text-slate-900 leading-5 truncate">{header.title}</div>
           {header.subtitle && (
-            <div className="text-xs text-slate-300 truncate mt-0.5">{header.subtitle}</div>
+            <div className="text-xs text-slate-500 truncate mt-0.5">{header.subtitle}</div>
           )}
         </div>
 
@@ -52,9 +52,9 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
         {/* Search */}
         <div className="hidden md:flex items-center gap-2 w-[320px] max-w-[35vw]">
           <div className="relative w-full group">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-cyan transition-colors" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-emerald-600 transition-colors" />
             <input 
-              className="input pl-10 pr-4 bg-white/10 border-white/20 text-white placeholder:text-slate-400 focus:bg-white/15" 
+              className="input pl-10 pr-4 bg-white border-slate-200 text-slate-900 placeholder:text-slate-400 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500" 
               placeholder="Cari buruh, pekerjaan, kontrak..." 
             />
           </div>

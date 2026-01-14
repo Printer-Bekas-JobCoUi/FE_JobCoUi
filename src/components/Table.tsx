@@ -35,8 +35,8 @@ export default function Table<T extends Record<string, unknown>>({
     if (!sortConfig) return rows;
     
     return [...rows].sort((a, b) => {
-      const aVal = a[sortConfig.key];
-      const bVal = b[sortConfig.key];
+      const aVal = a[sortConfig.key] as string | number;
+      const bVal = b[sortConfig.key] as string | number;
       
       if (aVal === bVal) return 0;
       
@@ -46,38 +46,32 @@ export default function Table<T extends Record<string, unknown>>({
   }, [rows, sortConfig]);
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        {/* Modern header with gradient underline */}
-        <thead className="border-b-2 border-white/10 relative">
-          <tr className="relative">
-            {/* Gradient underline */}
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/50 via-accent/50 to-cyan/50" style={{
-              background: 'linear-gradient(90deg, rgba(102,126,234,0.5) 0%, rgba(245,87,108,0.5) 50%, rgba(56,249,215,0.5) 100%)'
-            }} />
-            
+    <div className="overflow-x-auto rounded-lg border border-slate-200">
+      <table className="w-full text-sm text-left">
+        <thead className="bg-slate-50 border-b border-slate-200">
+          <tr>
             {columns.map((col) => (
               <th
                 key={col.key}
-                className={`text-left py-4 px-4 first:pl-0 last:pr-0 text-xs font-bold text-slate-300 uppercase tracking-wider group ${
-                  col.sortable ? "cursor-pointer select-none" : ""
+                className={`py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider group ${
+                  col.sortable ? "cursor-pointer select-none hover:bg-slate-100" : ""
                 } ${col.className ?? ""}`}
                 onClick={() => col.sortable && handleSort(col.key)}
               >
                 <div className="flex items-center gap-2">
-                  <span className="transition-colors group-hover:text-white">
+                  <span className="text-slate-600">
                     {col.title}
                   </span>
                   {col.sortable && (
                     <span className="opacity-0 group-hover:opacity-100 transition-opacity">
                       {sortConfig?.key === col.key ? (
                         sortConfig.direction === "asc" ? (
-                          <ArrowUp className="h-3 w-3 text-primary" />
+                          <ArrowUp className="h-3 w-3 text-emerald-600" />
                         ) : (
-                          <ArrowDown className="h-3 w-3 text-accent" />
+                          <ArrowDown className="h-3 w-3 text-emerald-600" />
                         )
                       ) : (
-                        <ArrowUp className="h-3 w-3 text-slate-500" />
+                        <ArrowUp className="h-3 w-3 text-slate-400" />
                       )}
                     </span>
                   )}
@@ -87,20 +81,16 @@ export default function Table<T extends Record<string, unknown>>({
           </tr>
         </thead>
         
-        {/* Interactive table body */}
-        <tbody className="divide-y divide-white/5">
+        <tbody className="divide-y divide-slate-100 bg-white">
           {sortedRows.map((row, idx) => (
             <tr
               key={idx}
-              className="table-row group relative"
+              className="hover:bg-slate-50 transition-colors"
             >
-              {/* Accent line on hover */}
-              <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-cyan opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
               {columns.map((col) => (
                 <td
                   key={col.key}
-                  className={`py-4 px-4 first:pl-0 last:pr-0 text-slate-300 relative ${
+                  className={`py-3 px-4 text-slate-700 ${
                     col.className ?? ""
                   }`}
                 >
@@ -118,11 +108,10 @@ export default function Table<T extends Record<string, unknown>>({
                 className="py-12 text-center text-slate-400"
               >
                 <div className="flex flex-col items-center gap-3">
-                  <div className="h-16 w-16 rounded-full bg-white/5 flex items-center justify-center">
-                    <span className="text-3xl">📋</span>
+                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
+                    <span className="text-2xl text-slate-300">📋</span>
                   </div>
-                  <div className="font-medium">Tidak ada data</div>
-                  <div className="text-xs">Data akan muncul di sini</div>
+                  <div className="font-medium text-slate-600">Tidak ada data</div>
                 </div>
               </td>
             </tr>

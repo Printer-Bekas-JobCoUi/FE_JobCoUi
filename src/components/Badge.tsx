@@ -7,14 +7,14 @@ type BadgeProps = {
 }
 
 const toneStyles: Record<string, string> = {
-  slate: 'bg-slate-500/20 text-slate-200 border-slate-400/30',
-  blue: 'bg-blue-500/20 text-blue-200 border-blue-400/30',
-  green: 'bg-success/20 text-success border-success/30',
-  amber: 'bg-amber-500/20 text-amber-200 border-amber-400/30',
-  rose: 'bg-accent/20 text-accent border-accent/30',
-  primary: 'bg-primary/20 text-primary border-primary/30 shadow-glow-primary',
-  accent: 'bg-accent/20 text-accent border-accent/30',
-  cyan: 'bg-cyan/20 text-cyan border-cyan/30 shadow-glow-cyan'
+  slate: 'bg-slate-100 text-slate-700 border-slate-200',
+  blue: 'bg-blue-50 text-blue-700 border-blue-200',
+  green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  amber: 'bg-amber-50 text-amber-700 border-amber-200',
+  rose: 'bg-rose-50 text-rose-700 border-rose-200',
+  primary: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  accent: 'bg-amber-50 text-amber-700 border-amber-200',
+  cyan: 'bg-cyan-50 text-cyan-700 border-cyan-200'
 }
 
 export default function Badge({ tone = 'slate', children, icon }: BadgeProps) {

@@ -35,12 +35,12 @@ export default function Dashboard() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard title="Total Buruh" value={String(stats.totalWorkers)} hint="Akun terdaftar" icon={<Users className="h-4 w-4" />} trend={{ value: '+6% minggu ini', positive: true }} />
-        <StatCard title="Total Pemberi Kerja" value={String(stats.totalEmployers)} hint="Akun perusahaan/individu" icon={<Briefcase className="h-4 w-4" />} trend={{ value: '+2% minggu ini', positive: true }} />
-        <StatCard title="Pekerjaan Aktif" value={String(stats.activeJobs)} hint="Lowongan terbuka" icon={<Briefcase className="h-4 w-4" />} trend={{ value: '-1% minggu ini', positive: false }} />
-        <StatCard title="Kontrak Berjalan" value={String(stats.activeContracts)} hint="Kontrak aktif" icon={<FileText className="h-4 w-4" />} />
-        <StatCard title="Pembayaran Menunggu" value={String(stats.pendingPayments)} hint="Butuh verifikasi/settlement" icon={<Wallet className="h-4 w-4" />} />
-        <StatCard title="Tx Blockchain Pending" value={String(stats.pendingChain)} hint="Simulasi status jaringan" icon={<Blocks className="h-4 w-4" />} />
+        <StatCard title="Total Buruh" value={String(stats.totalWorkers)} hint="Akun terdaftar" icon={<Users className="h-4 w-4" />} trend={{ value: '+6% minggu ini', positive: true }} tone="emerald" />
+        <StatCard title="Total Pemberi Kerja" value={String(stats.totalEmployers)} hint="Akun perusahaan/individu" icon={<Briefcase className="h-4 w-4" />} trend={{ value: '+2% minggu ini', positive: true }} tone="blue" />
+        <StatCard title="Pekerjaan Aktif" value={String(stats.activeJobs)} hint="Lowongan terbuka" icon={<Briefcase className="h-4 w-4" />} trend={{ value: '-1% minggu ini', positive: false }} tone="purple" />
+        <StatCard title="Kontrak Berjalan" value={String(stats.activeContracts)} hint="Kontrak aktif" icon={<FileText className="h-4 w-4" />} tone="amber" />
+        <StatCard title="Pembayaran Menunggu" value={String(stats.pendingPayments)} hint="Butuh verifikasi/settlement" icon={<Wallet className="h-4 w-4" />} tone="rose" />
+        <StatCard title="Tx Blockchain Pending" value={String(stats.pendingChain)} hint="Simulasi status jaringan" icon={<Blocks className="h-4 w-4" />} tone="cyan" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

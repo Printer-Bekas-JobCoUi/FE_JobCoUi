@@ -7,11 +7,23 @@ type StatCardProps = {
   hint?: string
   trend?: { value: string; positive?: boolean }
   icon?: React.ReactNode
+  tone?: 'emerald' | 'blue' | 'purple' | 'amber' | 'rose' | 'cyan'
 }
 
-export default function StatCard({ title, value, hint, trend, icon }: StatCardProps) {
+const toneStyles = {
+  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', hoverBg: 'group-hover:bg-emerald-100', border: 'hover:border-emerald-200' },
+  blue: { bg: 'bg-blue-50', text: 'text-blue-600', hoverBg: 'group-hover:bg-blue-100', border: 'hover:border-blue-200' },
+  purple: { bg: 'bg-purple-50', text: 'text-purple-600', hoverBg: 'group-hover:bg-purple-100', border: 'hover:border-purple-200' },
+  amber: { bg: 'bg-amber-50', text: 'text-amber-600', hoverBg: 'group-hover:bg-amber-100', border: 'hover:border-amber-200' },
+  rose: { bg: 'bg-rose-50', text: 'text-rose-600', hoverBg: 'group-hover:bg-rose-100', border: 'hover:border-rose-200' },
+  cyan: { bg: 'bg-cyan-50', text: 'text-cyan-600', hoverBg: 'group-hover:bg-cyan-100', border: 'hover:border-cyan-200' },
+}
+
+export default function StatCard({ title, value, hint, trend, icon, tone = 'emerald' }: StatCardProps) {
   const [count, setCount] = useState(0)
   const targetValue = parseInt(value.replace(/\D/g, '')) || 0
+
+  const styles = toneStyles[tone]
 
   // Animate counter on mount
   useEffect(() => {
@@ -36,25 +48,22 @@ export default function StatCard({ title, value, hint, trend, icon }: StatCardPr
   const displayValue = value.match(/\d/) ? count.toString() : value
 
   return (
-    <div className="card p-6 group cursor-pointer relative">
-      {/* Gradient background overlay */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl bg-gradient-to-br from-primary/10 via-accent/10 to-cyan/10" />
-      
-      <div className="flex items-start gap-4 relative z-10">
-        {/* Animated icon with glow */}
-        <div className="stat-icon group-hover:scale-110 transition-transform duration-300">
+    <div className={`card p-6 group cursor-pointer bg-white transition-colors duration-200 ${styles.border}`}>
+      <div className="flex items-start gap-4">
+        {/* Simple Icon Box */}
+        <div className={`h-10 w-10 rounded-lg ${styles.bg} ${styles.text} grid place-items-center transition-colors ${styles.hoverBg}`}>
           {icon}
         </div>
         
         <div className="min-w-0 flex-1">
-          <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
             {title}
           </div>
-          <div className="text-3xl font-bold text-white mt-2 group-hover:gradient-text transition-all">
+          <div className="text-2xl font-bold text-slate-900 mt-1">
             {displayValue}
           </div>
           {hint && (
-            <div className="text-xs text-slate-500 mt-1 group-hover:text-slate-400 transition-colors">
+            <div className="text-xs text-slate-400 mt-1">
               {hint}
             </div>
           )}
@@ -64,16 +73,16 @@ export default function StatCard({ title, value, hint, trend, icon }: StatCardPr
           {trend && (
             <span
               className={[
-                'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold backdrop-blur-sm transition-all duration-300 group-hover:scale-105',
+                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
                 trend.positive
-                  ? 'bg-success/20 text-success border border-success/30'
-                  : 'bg-accent/20 text-accent border border-accent/30'
+                  ? 'bg-emerald-100 text-emerald-700'
+                  : 'bg-red-100 text-red-700'
               ].join(' ')}
             >
               {trend.positive ? (
-                <ArrowUpRight className="h-3.5 w-3.5" />
+                <ArrowUpRight className="h-3 w-3" />
               ) : (
-                <ArrowDownRight className="h-3.5 w-3.5" />
+                <ArrowDownRight className="h-3 w-3" />
               )}
               {trend.value}
             </span>
