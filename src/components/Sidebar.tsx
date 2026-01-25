@@ -59,13 +59,6 @@ const nav: NavItem[] = [
     icon: <Star className="h-4 w-4" />,
     section: "Komunitas",
   },
-
-  {
-    to: "/pengaturan",
-    label: "Pengaturan",
-    icon: <Settings className="h-4 w-4" />,
-    section: "Sistem",
-  },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {

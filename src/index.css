@@ -89,21 +89,25 @@
     @apply bg-slate-50 text-slate-600 ring-slate-500/10;
   }
 
-  /* Tables - Cleaner */
+  /* Tables - Cleaner & Professional */
   .table-container {
-    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm;
+    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300;
   }
   
   .table-header {
-    @apply bg-slate-50/50 px-6 py-3.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200;
+    @apply bg-slate-50/80 backdrop-blur-sm px-6 py-4 text-left text-[10px] font-bold uppercase tracking-widest text-slate-400 border-b border-slate-200;
   }
   
   .table-cell {
-    @apply px-6 py-4 whitespace-nowrap text-sm text-slate-600 border-b border-slate-100;
+    @apply px-6 py-4 whitespace-nowrap text-sm text-slate-600 border-b border-slate-50 font-medium;
   }
   
   .table-row {
-    @apply transition-colors duration-150 hover:bg-slate-50/80;
+    @apply transition-all duration-200 hover:bg-blue-50/30;
+  }
+
+  .table-row:last-child .table-cell {
+    @apply border-b-0;
   }
 
   /* Stats Card Icon */

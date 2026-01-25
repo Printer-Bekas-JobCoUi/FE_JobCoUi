@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader'
 import Badge from '../components/Badge'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
+import Pagination from '../components/Pagination'
 import { admin } from '../services/api'
 
 export default function Contracts() {
@@ -13,6 +14,8 @@ export default function Contracts() {
   const [openVerify, setOpenVerify] = useState(false)
   const [contracts, setContracts] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   const fetchContracts = async () => {
     setLoading(true)
@@ -65,6 +68,19 @@ export default function Contracts() {
     );
   }, [contracts, q]);
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredContracts.length / itemsPerPage)
+  const paginatedContracts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return filteredContracts.slice(startIndex, endIndex)
+  }, [filteredContracts, currentPage, itemsPerPage])
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [status, q])
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -112,60 +128,96 @@ export default function Contracts() {
         </div>
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden border-none shadow-none bg-transparent">
         <Table
+          loading={loading}
           columns={[
-            { key: 'id', title: 'ID', className: 'whitespace-nowrap font-mono text-xs text-slate-500', render: (r) => r.contractNumber || r.id },
+            { key: 'id', title: 'Contract ID', className: 'whitespace-nowrap font-mono text-[11px] text-slate-400', render: (r) => r.contractNumber || r.id },
             {
               key: 'jobTitle',
               title: 'Pekerjaan',
-              render: (r) => <span className="font-semibold text-slate-700">{r.job?.title}</span>
+              render: (r) => (
+                <div className="flex flex-col">
+                  <span className="font-bold text-slate-800">{r.job?.title}</span>
+                  <div className="text-[10px] text-slate-400 uppercase tracking-tight font-semibold mt-0.5">Job Assignment</div>
+                </div>
+              )
             },
-            { key: 'worker', title: 'Buruh', className: 'whitespace-nowrap text-sm text-slate-600', render: (r) => r.worker?.name },
-            { key: 'employer', title: 'Pemberi Kerja', className: 'whitespace-nowrap text-sm text-slate-600', render: (r) => r.employer?.name },
+            { 
+              key: 'worker', 
+              title: 'Pihak 1 (Worker)', 
+              render: (r) => (
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center text-[10px] font-bold text-blue-600 border border-blue-100">W</div>
+                  <span className="text-sm font-medium text-slate-700">{r.worker?.name}</span>
+                </div>
+              ) 
+            },
+            { 
+              key: 'employer', 
+              title: 'Pihak 2 (Employer)', 
+              render: (r) => (
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 rounded-full bg-indigo-50 flex items-center justify-center text-[10px] font-bold text-indigo-600 border border-indigo-100">E</div>
+                  <span className="text-sm font-medium text-slate-700">{r.employer?.name}</span>
+                </div>
+              ) 
+            },
             {
               key: 'periode',
-              title: 'Periode',
-              className: 'whitespace-nowrap text-xs',
-              render: (r) => r.startedAt ? `${new Date(r.startedAt).toLocaleDateString('id-ID')} - ${r.finishedAt ? new Date(r.finishedAt).toLocaleDateString('id-ID') : '?'}` : '-'
+              title: 'Masa Kontrak',
+              className: 'whitespace-nowrap text-[11px] font-mono text-slate-500',
+              render: (r) => r.startedAt ? `${new Date(r.startedAt).toLocaleDateString('id-ID', {day:'2-digit', month:'short'})} - ${r.finishedAt ? new Date(r.finishedAt).toLocaleDateString('id-ID', {day:'2-digit', month:'short'}) : '?'}` : '-'
             },
             {
               key: 'upah',
-              title: 'Upah',
-              className: 'whitespace-nowrap font-medium text-slate-900',
+              title: 'Kesepakatan Upah',
+              className: 'whitespace-nowrap font-bold text-emerald-600',
               render: (r) => formatCurrency(r.agreedWage)
             },
             {
               key: 'status',
-              title: 'Status',
+              title: 'Status Legislasi',
               className: 'whitespace-nowrap',
               render: (r) => {
                 const s = mapStatus(r.status)
                 return (
                   <Badge tone={s === 'Aktif' ? 'green' : s === 'Batal' ? 'rose' : s === 'Draft' ? 'amber' : 'slate'}>
-                    {s}
+                    {s.toUpperCase()}
                   </Badge>
                 )
               }
             },
-            { key: 'hash', title: 'Hash', className: 'whitespace-nowrap font-mono text-[10px] text-slate-400', render: (r) => r.chainTxHash ? `${r.chainTxHash.substring(0, 10)}...` : '-' },
+            { key: 'hash', title: 'TX Proof', className: 'whitespace-nowrap font-mono text-[10px] text-slate-400', render: (r) => r.chainTxHash ? (
+              <div className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+                {`${r.chainTxHash.substring(0, 8)}...`}
+              </div>
+            ) : '-' },
             {
               key: 'actions',
-              title: '',
-              className: 'whitespace-nowrap text-right pr-4',
+              title: 'Opsi',
+              className: 'whitespace-nowrap text-center',
               render: (r) => (
-                <div className="flex justify-end gap-2">
-                  <button className="btn-secondary text-xs h-8 px-3" type="button" onClick={() => setSelected(r)}>
-                    Detail
+                <div className="flex justify-center gap-2">
+                  <button className="btn-primary text-[11px] h-7 px-5 shadow-sm shadow-blue-500/10" type="button" onClick={() => setSelected(r)}>
+                    View
                   </button>
                 </div>
               )
             }
           ]}
-          rows={filteredContracts}
-          emptyText={loading ? 'Memuat data...' : 'Tidak ada kontrak ditemukan.'}
+          rows={paginatedContracts}
+          emptyText="Tidak ada kontrak digital ditemukan."
         />
       </div>
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
       <Modal
         open={!!selected && !openVerify}

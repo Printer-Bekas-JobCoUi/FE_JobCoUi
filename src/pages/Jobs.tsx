@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader'
 import Badge from '../components/Badge'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
+import Pagination from '../components/Pagination'
 import { admin } from '../services/api'
 
 export default function Jobs() {
@@ -12,6 +13,8 @@ export default function Jobs() {
   const [selected, setSelected] = useState<any | null>(null)
   const [jobs, setJobs] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   const fetchJobs = async () => {
     setLoading(true)
@@ -49,6 +52,19 @@ export default function Jobs() {
   const formatCurrency = (val: any) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
   }
+
+  // Pagination calculations
+  const totalPages = Math.ceil(jobs.length / itemsPerPage)
+  const paginatedJobs = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return jobs.slice(startIndex, endIndex)
+  }, [jobs, currentPage, itemsPerPage])
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [status, q])
 
   return (
     <div className="space-y-6">
@@ -107,35 +123,43 @@ export default function Jobs() {
         </div>
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden border-none shadow-none bg-transparent">
         <Table
+          loading={loading}
           columns={[
-            { key: 'id', title: 'ID', className: 'whitespace-nowrap font-mono text-xs text-slate-500' },
+            { key: 'id', title: 'Job ID', className: 'whitespace-nowrap font-mono text-[11px] text-slate-400' },
             {
               key: 'title',
-              title: 'Judul Pekerjaan',
+              title: 'Posisi & Lokasi',
               render: (r) => (
                 <div className="flex flex-col">
                   <button
-                    className="font-semibold text-left hover:text-blue-600 hover:underline text-slate-900"
+                    className="font-bold text-left hover:text-blue-600 transition-colors text-slate-800"
                     onClick={() => setSelected(r)}
                     type="button"
                   >
                     {r.title}
                   </button>
-                  <span className="text-xs text-slate-500">{r.location}</span>
+                  <div className="flex items-center gap-1 text-[10px] text-slate-400 uppercase tracking-tight font-semibold mt-0.5">
+                    <span className="text-blue-500">📍</span> {r.location}
+                  </div>
                 </div>
               )
             },
             {
               key: 'upah',
-              title: 'Upah',
-              className: 'whitespace-nowrap font-medium text-slate-700',
-              render: (r) => formatCurrency(r.wage)
+              title: 'Upah / Gaji',
+              className: 'whitespace-nowrap font-bold text-slate-700',
+              render: (r) => (
+                <div className="flex flex-col">
+                  <span className="text-emerald-600">{formatCurrency(r.wage)}</span>
+                  <span className="text-[10px] text-slate-400 uppercase tracking-tight">Per Projek</span>
+                </div>
+              )
             },
             {
               key: 'status',
-              title: 'Status',
+              title: 'SLA Status',
               className: 'whitespace-nowrap',
               render: (r) => {
                 const s = mapStatus(r.status)
@@ -152,37 +176,47 @@ export default function Jobs() {
             },
             {
               key: 'pelamar',
-              title: 'Pelamar',
-              className: 'whitespace-nowrap text-center',
+              title: 'Kandidat',
+              className: 'whitespace-nowrap',
               render: (r) => (
-                <div className="text-center">
-                  <span className="font-semibold">{r.applications?.length || 0}</span> <span className="text-xs text-slate-500">orang</span>
+                <div className="flex items-center gap-2">
+                  <div className="h-7 w-7 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
+                    <span className="text-[10px] font-bold text-blue-600">{r.applications?.length || 0}</span>
+                  </div>
+                  <span className="text-xs text-slate-500 font-medium tracking-tight">Pelamar</span>
                 </div>
               )
             },
             {
               key: 'dibuat',
-              title: 'Tanggal Dibuat',
-              className: 'whitespace-nowrap text-xs text-slate-500',
-              render: (r) => new Date(r.createdAt).toLocaleDateString('id-ID')
+              title: 'Publish Date',
+              className: 'whitespace-nowrap text-[11px] text-slate-400 font-mono',
+              render: (r) => new Date(r.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
             },
             {
               key: 'actions',
-              title: <span className="block text-right pr-4">Opsi</span>,
-              className: 'whitespace-nowrap text-right',
+              title: 'Opsi',
+              className: 'whitespace-nowrap text-center',
               render: (r) => (
-                <div className="flex justify-end gap-2">
-                  <button className="btn-secondary text-xs h-8 px-3" type="button" onClick={() => setSelected(r)}>
-                    Detail
+                <div className="flex justify-center gap-2">
+                  <button className="btn-primary text-[10px] h-7 px-5 shadow-sm shadow-blue-500/10" type="button" onClick={() => setSelected(r)}>
+                    Manage
                   </button>
                 </div>
               )
             }
           ]}
-          rows={jobs}
-          emptyText={loading ? 'Memuat data...' : 'Tidak ada pekerjaan ditemukan.'}
+          rows={paginatedJobs}
+          emptyText="Tidak ada lowongan pekerjaan ditemukan."
         />
       </div>
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
       <Modal
         open={!!selected}

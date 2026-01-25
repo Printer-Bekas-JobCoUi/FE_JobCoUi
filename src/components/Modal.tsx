@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 export default function Modal({
@@ -24,8 +25,8 @@ export default function Modal({
 
   if (!open) return null
 
-  return (
-    <div className="fixed inset-0 z-50">
+  return createPortal(
+    <div className="fixed inset-0 z-[100]">
       <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
       <div className="absolute inset-0 p-4 sm:p-8 grid place-items-center">
         <div className="card w-full max-w-2xl">
@@ -40,6 +41,7 @@ export default function Modal({
           {footer && <div className="px-4 sm:px-6 py-4 border-t border-slate-200">{footer}</div>}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }

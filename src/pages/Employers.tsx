@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Search, Filter, RefreshCcw, FileSpreadsheet } from 'lucide-react';
 import PageHeader from "../components/PageHeader";
 import Badge from "../components/Badge";
 import Table from "../components/Table";
 import Modal from "../components/Modal";
+import Pagination from "../components/Pagination";
 import { admin } from "../services/api";
 
 export default function Employers() {
@@ -16,6 +17,8 @@ export default function Employers() {
   const [adminNote, setAdminNote] = useState("");
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -39,7 +42,20 @@ export default function Employers() {
     fetchUsers();
   }, [kycFilter]);
 
-  const rows = users;
+  // Pagination calculations
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return users.slice(startIndex, endIndex);
+  }, [users, currentPage, itemsPerPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [kycFilter, q]);
+
+  const rows = paginatedUsers;
 
   return (
     <div className="space-y-6">
@@ -97,40 +113,46 @@ export default function Employers() {
         </div>
       </div>
 
-      <div className="card overflow-hidden">
+      <div className="card overflow-hidden border-none shadow-none bg-transparent">
         <Table
+          loading={loading}
           columns={[
-            { key: "id", title: "ID", className: "whitespace-nowrap font-mono text-xs text-slate-500" },
+            { key: "id", title: "Employer ID", className: "whitespace-nowrap font-mono text-[11px] text-slate-400" },
             {
               key: "name",
-              title: "Nama",
+              title: "Identitas Perusahaan / Individu",
               render: (r: any) => (
                 <div className="flex items-center gap-3">
-                  <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
+                  <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shadow-sm ring-2 ring-white">
                     {r.name.charAt(0)}
                   </div>
                   <div className="flex flex-col">
                     <button
-                      className="font-semibold text-slate-900 hover:text-blue-600 hover:underline text-left"
+                      className="font-bold text-slate-800 hover:text-indigo-600 transition-colors text-left"
                       onClick={() => setSelected(r)}
                       type="button"
                     >
                       {r.name}
                     </button>
-                    <span className="text-xs text-slate-500">{r.email}</span>
+                    <span className="text-[10px] text-slate-400 font-medium">{r.email}</span>
                   </div>
                 </div>
               ),
             },
             {
               key: "walletAddress",
-              title: "Wallet",
-              className: "whitespace-nowrap font-mono text-xs",
-              render: (r: any) => r.walletAddress ? `${r.walletAddress.substring(0, 6)}...${r.walletAddress.substring(38)}` : '-'
+              title: "Blockchain Wallet",
+              className: "whitespace-nowrap font-mono text-[11px] text-slate-500",
+              render: (r: any) => r.walletAddress ? (
+                <div className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse"></span>
+                  {`${r.walletAddress.substring(0, 6)}...${r.walletAddress.substring(38)}`}
+                </div>
+              ) : '-'
             },
             {
               key: "kycStatus",
-              title: "KYC Status",
+              title: "Verifikasi KYC",
               className: "whitespace-nowrap",
               render: (r: any) => {
                 let tone: any = "amber";
@@ -139,19 +161,19 @@ export default function Employers() {
                 if (r.kycStatus === 'pending') tone = "blue";
                 return (
                   <Badge tone={tone}>
-                    {r.kycStatus}
+                    {r.kycStatus.toUpperCase()}
                   </Badge>
                 );
               }
             },
             {
               key: "actions",
-              title: <span className="block text-right pr-4">Opsi</span>,
-              className: "whitespace-nowrap text-right",
+              title: "Opsi",
+              className: "whitespace-nowrap text-center",
               render: (r: any) => (
-                <div className="flex justify-end items-center gap-2">
+                <div className="flex justify-center items-center gap-2">
                   <button
-                    className="btn-secondary text-xs h-8 px-3"
+                    className="btn-secondary text-[11px] h-7 px-3 border-slate-200"
                     type="button"
                     onClick={() => {
                       setSelected(r);
@@ -159,10 +181,10 @@ export default function Employers() {
                       setSelectedVerification(r.kycStatus);
                     }}
                   >
-                    Detail
+                    Profil
                   </button>
                   <button
-                    className="btn-primary text-xs h-8 px-3"
+                    className="btn-primary text-[11px] h-7 px-3 shadow-sm bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
                     type="button"
                     onClick={() => {
                       setSelected(r);
@@ -176,13 +198,16 @@ export default function Employers() {
             },
           ]}
           rows={rows}
+          emptyText="Tidak ada data pemberi kerja ditemukan."
         />
-        {loading && (
-          <div className="p-10 text-center text-slate-500 font-medium">
-            Memuat data...
-          </div>
-        )}
       </div>
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
       <Modal
         open={!!selected && modalMode === "detail"}

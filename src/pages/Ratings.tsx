@@ -4,6 +4,7 @@ import PageHeader from '../components/PageHeader'
 import Badge from '../components/Badge'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
+import Pagination from '../components/Pagination'
 import { admin } from '../services/api'
 
 export default function Ratings() {
@@ -12,6 +13,8 @@ export default function Ratings() {
   const [selected, setSelected] = useState<any | null>(null)
   const [ratings, setRatings] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 10
 
   const fetchRatings = async () => {
     setLoading(true)
@@ -36,6 +39,19 @@ export default function Ratings() {
   }, [])
 
   // Removed client-side search logic as it's now handled by the server
+
+  // Pagination calculations
+  const totalPages = Math.ceil(ratings.length / itemsPerPage)
+  const paginatedRatings = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const endIndex = startIndex + itemsPerPage
+    return ratings.slice(startIndex, endIndex)
+  }, [ratings, currentPage, itemsPerPage])
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [status, q])
 
   return (
     <div className="space-y-6">
@@ -84,50 +100,95 @@ export default function Ratings() {
       </div>
 
       <div className="card overflow-hidden">
+        <div>
         <Table
+          loading={loading}
           columns={[
-            { key: 'id', title: 'ID', className: 'whitespace-nowrap font-mono text-xs text-slate-500' },
+            { key: 'id', title: 'Audit ID', className: 'whitespace-nowrap font-mono text-[11px] text-slate-400' },
             {
               key: 'createdAt',
               title: 'Tanggal',
-              className: 'whitespace-nowrap text-xs text-slate-500',
-              render: (r) => new Date(r.createdAt).toLocaleDateString('id-ID')
+              className: 'whitespace-nowrap text-[11px] text-slate-500',
+              render: (r: any) => new Date(r.createdAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
             },
-            { key: 'from', title: 'Dari', render: (r) => <span className="font-semibold">{r.fromUser?.name}</span> },
-            { key: 'to', title: 'Untuk', render: (r) => <span className="font-semibold">{r.toUser?.name}</span> },
-            { key: 'role', title: 'Tipe', className: 'whitespace-nowrap text-xs', render: (r) => <Badge tone="blue">{r.fromUser?.role === 'employer' ? 'Pemberi Kerja' : 'Buruh'}</Badge> },
             {
-              key: 'score',
-              title: 'Skor',
-              className: 'whitespace-nowrap',
-              render: (r) => (
-                <div className="flex items-center gap-1">
-                  <span className="text-amber-400">★</span> <span className="font-bold">{r.score}</span>
+              key: 'fromUser',
+              title: 'Pemberi (Auditor)',
+              render: (r: any) => (
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-indigo-50 flex items-center justify-center text-[10px] font-bold text-indigo-600 border border-indigo-100">
+                    {r.fromUser?.name?.charAt(0) || 'A'}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-slate-700">{r.fromUser?.name || 'System'}</span>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-tight">{r.fromUser?.role === 'employer' ? 'Employer' : 'Worker'}</span>
+                  </div>
                 </div>
               )
             },
-            { key: 'comment', title: 'Komentar', className: 'italic text-slate-600' },
             {
-              key: 'status',
-              title: 'Status',
+              key: 'toUser',
+              title: 'Penerima (Auditee)',
+              render: (r: any) => (
+                <div className="flex items-center gap-3">
+                  <div className="h-8 w-8 rounded-full bg-blue-50 flex items-center justify-center text-[10px] font-bold text-blue-600 border border-blue-100">
+                    {r.toUser?.name?.charAt(0) || 'B'}
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-slate-700">{r.toUser?.name || 'System'}</span>
+                    <span className="text-[10px] text-slate-400 uppercase tracking-tight">{r.toUser?.role === 'worker' ? 'Worker' : 'Employer'}</span>
+                  </div>
+                </div>
+              )
+            },
+            {
+              key: 'score',
+              title: 'Rating & Skor',
               className: 'whitespace-nowrap',
-              render: (r) => <Badge tone="green">Tampil</Badge>
+              render: (r: any) => (
+                <div className="flex items-center gap-2">
+                  <div className="flex text-amber-500 text-lg leading-none">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <span key={i} className={i < r.score ? 'drop-shadow-sm' : 'opacity-10'}>★</span>
+                    ))}
+                  </div>
+                  <span className="text-xs font-black text-slate-900 bg-amber-100 px-1.5 py-0.5 rounded-md leading-none border border-amber-200">{r.score}.0</span>
+                </div>
+              )
+            },
+            {
+              key: 'comment',
+              title: 'Feedback Pesan',
+              className: 'max-w-xs',
+              render: (r: any) => (
+                <p className="truncate text-xs text-slate-500 italic leading-relaxed" title={r.comment}>
+                  "{r.comment || 'Tidak ada komentar terpilih.'}"
+                </p>
+              )
             },
             {
               key: 'actions',
-              title: '',
-              className: 'whitespace-nowrap text-right pr-4',
-              render: (r) => (
-                <div className="flex justify-end gap-2">
-                  <button className="btn-secondary text-xs h-8 px-3" type="button" onClick={() => setSelected(r)}>
-                    Review
+              title: 'Opsi',
+              className: 'whitespace-nowrap text-center',
+              render: (r: any) => (
+                <div className="flex justify-center gap-2">
+                  <button className="btn-primary text-[11px] h-7 px-5 shadow-sm shadow-blue-500/10" type="button" onClick={() => setSelected(r)}>
+                    Inspect
                   </button>
                 </div>
               )
             }
           ]}
-          rows={ratings}
-          emptyText={loading ? 'Memuat data...' : 'Tidak ada rating ditemukan.'}
+          rows={paginatedRatings}
+          emptyText="Tidak ada riwayat rating dan audit ditemukan."
+        />
+      </div>
+
+        {/* Pagination */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
         />
       </div>
 

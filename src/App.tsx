@@ -12,7 +12,6 @@ import Jobs from "./pages/Jobs";
 import Contracts from "./pages/Contracts";
 import Payments from "./pages/Payments";
 import Ratings from "./pages/Ratings";
-import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -42,7 +41,6 @@ export default function App() {
           <Route path="kontrak" element={<Contracts />} />
           <Route path="pembayaran" element={<Payments />} />
           <Route path="rating" element={<Ratings />} />
-          <Route path="pengaturan" element={<Settings />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

@@ -100,15 +100,6 @@ export default function Topbar({ onOpenSidebar }: { onOpenSidebar: () => void })
                       <div className="text-xs text-slate-500 truncate">{user?.email ?? 'admin@example.com'}</div>
                     </div>
                   </div>
-                  
-                  {/* Role Badge */}
-                  <div className="px-3 pb-3">
-                    <span className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      {user?.role ?? 'Super Admin'}
-                    </span>
-                  </div>
-                  
                   <div className="h-px bg-gradient-to-r from-transparent via-slate-200 to-transparent my-2" />
                   
                   {/* Menu Items */}

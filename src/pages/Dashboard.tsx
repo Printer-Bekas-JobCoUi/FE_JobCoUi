@@ -12,7 +12,6 @@ export default function Dashboard() {
     activeJobs: 0,
     activeContracts: 0,
     pendingPayments: 0,
-    pendingChain: 0,
     recentActivities: [],
     verifiedWorkers: 0,
     verifiedEmployers: 0,
@@ -92,7 +91,6 @@ export default function Dashboard() {
         <StatCard title="Pekerjaan Aktif" value={String(stats.activeJobs)} hint="Lowongan terbuka" icon={<Briefcase className="h-4 w-4" />} trend={{ value: '-1% minggu ini', positive: false }} tone="purple" />
         <StatCard title="Kontrak Berjalan" value={String(stats.activeContracts)} hint="Kontrak aktif" icon={<FileText className="h-4 w-4" />} tone="amber" />
         <StatCard title="Pembayaran Menunggu" value={String(stats.pendingPayments)} hint="Butuh verifikasi" icon={<Wallet className="h-4 w-4" />} tone="rose" />
-        <StatCard title="Tx Blockchain" value={String(stats.pendingChain)} hint="Status jaringan" icon={<Blocks className="h-4 w-4" />} tone="cyan" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
