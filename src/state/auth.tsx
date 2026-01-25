@@ -9,15 +9,15 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-const LS_KEY = 'bhl_admin_demo_auth'
+const TOKEN_KEY = 'admin_token'
+const USER_KEY = 'admin_user'
 
 function loadFromStorage(): { isAuthed: boolean; user: AuthContextValue['user'] } {
   try {
-    const raw = localStorage.getItem(LS_KEY)
-    if (!raw) return { isAuthed: false, user: null }
-    const parsed = JSON.parse(raw) as { token: string; user: AuthContextValue['user'] }
-    if (!parsed?.token) return { isAuthed: false, user: null }
-    return { isAuthed: true, user: parsed.user ?? null }
+    const token = localStorage.getItem(TOKEN_KEY)
+    const user = localStorage.getItem(USER_KEY)
+    if (!token || !user) return { isAuthed: false, user: null }
+    return { isAuthed: true, user: JSON.parse(user) }
   } catch {
     return { isAuthed: false, user: null }
   }
@@ -31,15 +31,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<AuthContextValue>(() => ({
     isAuthed,
     user,
-    login: (email: string) => {
-      // Frontend-only demo login:
-      const demoUser = { name: 'Admin', email, role: 'Super Admin' }
-      localStorage.setItem(LS_KEY, JSON.stringify({ token: 'demo-token', user: demoUser }))
-      setUser(demoUser)
+    login: (token: string, userData: any) => {
+      localStorage.setItem(TOKEN_KEY, token)
+      localStorage.setItem(USER_KEY, JSON.stringify(userData))
+      setUser(userData)
       setIsAuthed(true)
     },
     logout: () => {
-      localStorage.removeItem(LS_KEY)
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(USER_KEY)
       setIsAuthed(false)
       setUser(null)
     }

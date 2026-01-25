@@ -1,31 +1,45 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, Filter, RefreshCcw, FileSpreadsheet } from 'lucide-react';
 import PageHeader from "../components/PageHeader";
 import Badge from "../components/Badge";
 import Table from "../components/Table";
 import Modal from "../components/Modal";
-import { Employer, employers as seed } from "../data/mock";
+import { admin } from "../services/api";
 
 export default function Employers() {
   const [q, setQ] = useState("");
-  const [status, setStatus] = useState<"Semua" | "Aktif" | "Diblokir">("Semua");
-  const [selected, setSelected] = useState<Employer | null>(null);
+  const [kycFilter, setKycFilter] = useState<any>("Semua");
+  const [selected, setSelected] = useState<any>(null);
   const [modalMode, setModalMode] = useState<"detail" | "dokumen" | null>(null);
   const [selectedVerification, setSelectedVerification] =
-    useState<string>("Terverifikasi");
+    useState<string>("verified");
   const [adminNote, setAdminNote] = useState("");
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const rows = useMemo(() => {
-    return seed
-      .filter((e) => (status === "Semua" ? true : e.status === status))
-      .filter((e) =>
-        q
-          ? ((e.namaOrang || "") + e.bidang + e.domisili + e.id)
-              .toLowerCase()
-              .includes(q.toLowerCase())
-          : true
-      );
-  }, [q, status]);
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const res = await admin.getUsers({
+        role: 'employer',
+        kycStatus: kycFilter === "Semua" ? undefined : kycFilter,
+        search: q || undefined
+      });
+      if (res.data.success) {
+        setUsers(res.data.data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch employers", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [kycFilter]);
+
+  const rows = users;
 
   return (
     <div className="space-y-6">
@@ -50,32 +64,35 @@ export default function Employers() {
               className="input pl-10 bg-slate-50 border-slate-200 focus:bg-white"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Nama, bidang, atau domisili..."
+              onKeyPress={(e) => e.key === 'Enter' && fetchUsers()}
+              placeholder="Cari nama, email, atau wallet..."
             />
           </div>
-          
+
           <div className="flex items-center gap-2 w-full sm:w-auto">
-             <div className="relative min-w-[140px]">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
-                <select
-                  className="input pl-9 bg-slate-50 border-slate-200"
-                  value={status}
-                  onChange={(e) => setStatus(e.target.value as any)}
-                >
-                  <option>Semua</option>
-                  <option>Aktif</option>
-                  <option>Diblokir</option>
-                </select>
-             </div>
-             
-             <button 
-                className="btn-secondary px-3" 
-                type="button" 
-                onClick={() => { setQ(""); setStatus("Semua"); }}
-                title="Reset Filter"
+            <div className="relative min-w-[140px]">
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+              <select
+                className="input pl-9 bg-slate-50 border-slate-200"
+                value={kycFilter}
+                onChange={(e) => setKycFilter(e.target.value as any)}
               >
-               <RefreshCcw className="h-4 w-4 text-slate-500" />
-             </button>
+                <option value="Semua">Semua KYC</option>
+                <option value="pending">Pending</option>
+                <option value="verified">Verified</option>
+                <option value="rejected">Rejected</option>
+                <option value="unsubmitted">Unsubmitted</option>
+              </select>
+            </div>
+
+            <button
+              className="btn-secondary px-3"
+              type="button"
+              onClick={() => { setQ(""); setKycFilter("Semua"); fetchUsers(); }}
+              title="Reset Filter"
+            >
+              <RefreshCcw className="h-4 w-4 text-slate-500" />
+            </button>
           </div>
         </div>
       </div>
@@ -85,89 +102,53 @@ export default function Employers() {
           columns={[
             { key: "id", title: "ID", className: "whitespace-nowrap font-mono text-xs text-slate-500" },
             {
-              key: "namaOrang",
+              key: "name",
               title: "Nama",
-              render: (r) => (
+              render: (r: any) => (
                 <div className="flex items-center gap-3">
-                   {r.fotoUrl ? (
-                      <img src={r.fotoUrl} alt="" className="h-9 w-9 rounded-full object-cover bg-slate-100" />
-                   ) : (
-                      <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
-                         {(r.namaOrang || "").charAt(0)}
-                      </div>
-                   )}
-                   <div className="flex flex-col">
-                      <button
-                        className="font-semibold text-slate-900 hover:text-blue-600 hover:underline text-left"
-                        onClick={() => {
-                            setSelected(r);
-                            setModalMode("detail");
-                        }}
-                        type="button"
-                      >
-                        {r.namaOrang || "-"}
-                      </button>
-                      <span className="text-xs text-slate-500">{r.verified}</span>
-                   </div>
+                  <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
+                    {r.name.charAt(0)}
+                  </div>
+                  <div className="flex flex-col">
+                    <button
+                      className="font-semibold text-slate-900 hover:text-blue-600 hover:underline text-left"
+                      onClick={() => setSelected(r)}
+                      type="button"
+                    >
+                      {r.name}
+                    </button>
+                    <span className="text-xs text-slate-500">{r.email}</span>
+                  </div>
                 </div>
               ),
             },
             {
-               key: "ktpUrl",
-               title: "KTP",
-               className: "whitespace-nowrap",
-               render: (r) => (
-                  r.ktpUrl ? (
-                     <div className="flex items-center gap-1 text-xs text-blue-600 font-medium">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500" />
-                        Ada
-                     </div>
-                  ) : (
-                     <span className="text-xs text-slate-400">-</span>
-                  )
-               )
-            },
-            { key: "bidang", title: "Bidang", className: "whitespace-nowrap font-medium text-slate-700" },
-            {
-              key: "contact",
-              title: "Kontak",
-              className: "whitespace-nowrap text-xs",
-              render: (r) => (
-                 <div className="flex flex-col">
-                    <span>{r.email  || "-"}</span>
-                 </div>
-              ),
+              key: "walletAddress",
+              title: "Wallet",
+              className: "whitespace-nowrap font-mono text-xs",
+              render: (r: any) => r.walletAddress ? `${r.walletAddress.substring(0, 6)}...${r.walletAddress.substring(38)}` : '-'
             },
             {
-              key: "domisili",
-              title: "Domisili",
+              key: "kycStatus",
+              title: "KYC Status",
               className: "whitespace-nowrap",
-            },
-            {
-              key: "rating",
-              title: "Rating",
-              className: "whitespace-nowrap",
-              render: (r) => (
-                <div className="flex items-center gap-1 font-semibold text-slate-700">
-                   <span className="text-amber-400">★</span> {r.rating.toFixed(1)}
-                </div>
-              ),
-            },
-            {
-              key: "status",
-              title: "Status",
-              className: "whitespace-nowrap",
-              render: (r) => (
-                <Badge tone={r.status === "Aktif" ? "blue" : "rose"}>
-                  {r.status}
-                </Badge>
-              ),
+              render: (r: any) => {
+                let tone: any = "amber";
+                if (r.kycStatus === 'verified') tone = "green";
+                if (r.kycStatus === 'rejected') tone = "rose";
+                if (r.kycStatus === 'pending') tone = "blue";
+                return (
+                  <Badge tone={tone}>
+                    {r.kycStatus}
+                  </Badge>
+                );
+              }
             },
             {
               key: "actions",
               title: <span className="block text-right pr-4">Opsi</span>,
               className: "whitespace-nowrap text-right",
-              render: (r) => (
+              render: (r: any) => (
                 <div className="flex justify-end items-center gap-2">
                   <button
                     className="btn-secondary text-xs h-8 px-3"
@@ -175,45 +156,37 @@ export default function Employers() {
                     onClick={() => {
                       setSelected(r);
                       setModalMode("detail");
+                      setSelectedVerification(r.kycStatus);
                     }}
                   >
                     Detail
                   </button>
-                  {r.verified === "Belum" ? (
-                    <button
-                      className="btn-primary text-xs h-8 px-3"
-                      type="button"
-                      onClick={() => {
-                        setSelected({ ...r, verified: "Terverifikasi" });
-                        setSelectedVerification("Terverifikasi");
-                        setModalMode("detail");
-                      }}
-                    >
-                      Verifikasi
-                    </button>
-                  ) : (
-                    <button
-                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-2"
-                      type="button"
-                      onClick={() => {
-                        setSelected(r);
-                        setModalMode("dokumen");
-                      }}
-                    >
-                      Dokumen
-                    </button>
-                  )}
+                  <button
+                    className="btn-primary text-xs h-8 px-3"
+                    type="button"
+                    onClick={() => {
+                      setSelected(r);
+                      setModalMode("dokumen");
+                    }}
+                  >
+                    Dokumen
+                  </button>
                 </div>
               ),
             },
           ]}
           rows={rows}
         />
+        {loading && (
+          <div className="p-10 text-center text-slate-500 font-medium">
+            Memuat data...
+          </div>
+        )}
       </div>
 
       <Modal
         open={!!selected && modalMode === "detail"}
-        title={selected ? `Detail Pemberi Kerja • ${selected.namaOrang || "-"}` : "Detail"}
+        title={selected ? `Detail Pemberi Kerja • ${selected.name}` : "Detail"}
         onClose={() => {
           setSelected(null);
           setModalMode(null);
@@ -233,12 +206,16 @@ export default function Employers() {
             <button
               className="btn-primary px-8 font-bold shadow-lg shadow-blue-500/20"
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 if (selected) {
-                  setSelected({
-                    ...selected,
-                    verified: selectedVerification as any,
-                  });
+                  try {
+                    await admin.verifyKyc(selected.id, selectedVerification);
+                    fetchUsers();
+                    setSelected(null);
+                    setModalMode(null);
+                  } catch (e) {
+                    alert("Gagal memperbarui status KYC");
+                  }
                 }
               }}
             >
@@ -255,31 +232,20 @@ export default function Employers() {
                 <div className="font-semibold">{selected.id}</div>
               </div>
               <div>
-                <div className="text-xs text-slate-500">Nama</div>
-                <div className="font-semibold">{selected.namaOrang || "-"}</div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500">Bidang</div>
-                <div className="font-semibold">{selected.bidang}</div>
-              </div>
-              <div>
                 <div className="text-xs text-slate-500">Email</div>
                 <div className="font-semibold">{selected.email || "-"}</div>
               </div>
               <div>
-                <div className="text-xs text-slate-500">Domisili</div>
-                <div className="font-semibold">{selected.domisili}</div>
+                <div className="text-xs text-slate-500">Wallet</div>
+                <div className="font-semibold break-all text-xs font-mono">{selected.walletAddress}</div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge
                   tone={
-                    selected.verified === "Terverifikasi" ? "green" : "amber"
+                    selected.kycStatus === "verified" ? "green" : (selected.kycStatus === 'pending' ? 'blue' : 'amber')
                   }
                 >
-                  {selected.verified}
-                </Badge>
-                <Badge tone={selected.status === "Aktif" ? "blue" : "rose"}>
-                  {selected.status}
+                  {selected.kycStatus}
                 </Badge>
               </div>
             </div>
@@ -294,8 +260,10 @@ export default function Employers() {
                   value={selectedVerification}
                   onChange={(e) => setSelectedVerification(e.target.value)}
                 >
-                  <option>Terverifikasi</option>
-                  <option>Belum</option>
+                  <option value="verified">Verified</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="pending">Pending</option>
+                  <option value="unsubmitted">Unsubmitted</option>
                 </select>
               </label>
 
@@ -305,21 +273,11 @@ export default function Employers() {
                 </span>
                 <textarea
                   className="input min-h-[90px]"
-                  placeholder="Mis: perlu dokumen NPWP / NIB..."
+                  placeholder="Mis: Dokumen KTP belum jelas..."
                   value={adminNote}
                   onChange={(e) => setAdminNote(e.target.value)}
                 />
               </label>
-
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="text-xs text-slate-500">Reputasi</div>
-                <div className="mt-1 text-sm">
-                  Rating:{" "}
-                  <span className="font-semibold">
-                    {selected.rating.toFixed(1)}
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         )}
@@ -327,7 +285,7 @@ export default function Employers() {
 
       <Modal
         open={!!selected && modalMode === "dokumen"}
-        title={selected ? `Dokumen • ${selected.namaOrang || "-"}` : "Dokumen"}
+        title={selected ? `Dokumen • ${selected.name}` : "Dokumen"}
         onClose={() => {
           setSelected(null);
           setModalMode(null);
@@ -348,16 +306,16 @@ export default function Employers() {
         }
       >
         {selected && (
-          <div className="grid gap-4">
+          <div className="grid gap-4 max-h-[60vh] overflow-y-auto pr-2">
             <div>
               <div className="text-xs text-slate-600 mb-2 font-semibold">
-                Foto Profil
+                Foto Profil (Face)
               </div>
-              {selected.fotoUrl ? (
+              {selected.kycFaceKey ? (
                 <img
-                  src={selected.fotoUrl}
-                  alt={selected.namaOrang || "-"}
-                  className="w-full rounded border border-slate-200"
+                  src={selected.kycFaceKey.startsWith('data:') ? selected.kycFaceKey : `data:image/jpeg;base64,${selected.kycFaceKey}`}
+                  alt={selected.name}
+                  className="w-full max-h-[400px] object-contain rounded border border-slate-200 bg-slate-50"
                 />
               ) : (
                 <div className="w-full bg-slate-100 rounded border border-slate-200 flex items-center justify-center h-64">
@@ -365,51 +323,35 @@ export default function Employers() {
                 </div>
               )}
             </div>
-
             <div>
               <div className="text-xs text-slate-600 mb-2 font-semibold">
-                KTP
+                Foto KTP
               </div>
-              {selected.ktpUrl ? (
+              {selected.kycKtpKey ? (
                 <img
-                  src={selected.ktpUrl}
-                  alt={selected.namaOrang + " KTP"}
-                  className="w-full rounded border border-slate-200"
+                  src={selected.kycKtpKey.startsWith('data:') ? selected.kycKtpKey : `data:image/jpeg;base64,${selected.kycKtpKey}`}
+                  alt={selected.name + " KTP"}
+                  className="w-full max-h-[400px] object-contain rounded border border-slate-200 bg-slate-50"
                 />
               ) : (
                 <div className="w-full bg-slate-100 rounded border border-slate-200 flex items-center justify-center h-64">
-                  <span className="text-slate-500">KTP tidak tersedia</span>
+                  <span className="text-slate-500">Dokumen tidak tersedia</span>
                 </div>
               )}
             </div>
             <div className="grid gap-2 text-sm">
-
               <div>
-                <div className="text-xs text-slate-500">
-                  Nama
-                </div>
-                <div className="font-semibold">{selected.namaOrang || "-"}</div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500">ID</div>
-                <div className="font-semibold">{selected.id}</div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500">Email</div>
-                <div className="font-semibold">{selected.email || "-"}</div>
-              </div>
-              <div>
-                <div className="text-xs text-slate-500">Bidang Usaha</div>
-                <div className="font-semibold">{selected.bidang}</div>
+                <div className="text-xs text-slate-500">Nama</div>
+                <div className="font-semibold">{selected.name}</div>
               </div>
               <div>
                 <div className="text-xs text-slate-500">Status Verifikasi</div>
                 <Badge
                   tone={
-                    selected.verified === "Terverifikasi" ? "green" : "amber"
+                    selected.kycStatus === "verified" ? "green" : (selected.kycStatus === 'pending' ? 'blue' : 'amber')
                   }
                 >
-                  {selected.verified}
+                  {selected.kycStatus}
                 </Badge>
               </div>
             </div>
