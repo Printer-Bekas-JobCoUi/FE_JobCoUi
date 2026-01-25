@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { Search, Filter, RefreshCcw, FileSpreadsheet } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Badge from '../components/Badge'
 import Table from '../components/Table'
@@ -9,7 +10,6 @@ export default function Jobs() {
   const [q, setQ] = useState('')
   const [status, setStatus] = useState<'Semua' | 'Aktif' | 'Selesai' | 'Draf'>('Semua')
   const [selected, setSelected] = useState<Job | null>(null)
-  const [openCreate, setOpenCreate] = useState(false)
 
   const rows = useMemo(() => {
     return seed
@@ -18,60 +18,83 @@ export default function Jobs() {
   }, [q, status])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <PageHeader
         title="Pekerjaan"
-        description="Kelola lowongan/proyek: status, pelamar, dan histori."
+        description="Kelola lowongan, status proyek, dan pelacakan kontrak."
         actions={
           <>
-            <button className="btn-secondary" type="button">
-              Ekspor
-            </button>
-            <button className="btn-primary" type="button" onClick={() => setOpenCreate(true)}>
-              Buat Pekerjaan
+            <button className="btn-primary flex items-center gap-2" type="button">
+              <FileSpreadsheet className="h-4 w-4" />
+              Ekspor Data (Excel)
             </button>
           </>
         }
       />
 
-      <div className="card p-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Cari</span>
-            <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Judul / lokasi / ID" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Status</span>
-            <select className="input" value={status} onChange={(e) => setStatus(e.target.value as any)}>
-              <option>Semua</option>
-              <option>Aktif</option>
-              <option>Selesai</option>
-              <option>Draf</option>
-            </select>
-          </label>
-          <div className="flex items-end">
-            <button className="btn-secondary w-full" type="button">
-              Reset Filter
-            </button>
+      <div className="card p-5">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+          <div className="relative flex-1 w-full text-slate-500 focus-within:text-blue-600 transition-colors">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
+            <input 
+              className="input pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-all outline-none" 
+              value={q} 
+              onChange={(e) => setQ(e.target.value)} 
+              placeholder="Judul, lokasi, atau ID..." 
+            />
+          </div>
+          
+           <div className="flex items-center gap-2 w-full sm:w-auto">
+             <div className="relative min-w-[140px]">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                <select 
+                  className="input pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-all" 
+                  value={status} 
+                  onChange={(e) => setStatus(e.target.value as any)}
+                >
+                  <option>Semua</option>
+                  <option>Aktif</option>
+                  <option>Selesai</option>
+                  <option>Draf</option>
+                </select>
+            </div>
+            <button 
+                className="btn-secondary px-3" 
+                type="button" 
+                onClick={() => { setQ(""); setStatus("Semua"); }}
+                title="Reset Filter"
+              >
+               <RefreshCcw className="h-4 w-4 text-slate-500" />
+             </button>
           </div>
         </div>
       </div>
 
-      <div className="card">
+      <div className="card overflow-hidden">
         <Table
           columns={[
-            { key: 'id', title: 'ID', className: 'whitespace-nowrap' },
+            { key: 'id', title: 'ID', className: 'whitespace-nowrap font-mono text-xs text-slate-500' },
             {
               key: 'title',
-              title: 'Judul',
+              title: 'Judul Pekerjaan',
               render: (r) => (
-                <button className="font-semibold hover:underline" onClick={() => setSelected(r)} type="button">
-                  {r.title}
-                </button>
+                <div className="flex flex-col">
+                    <button 
+                        className="font-semibold text-left hover:text-blue-600 hover:underline text-slate-900" 
+                        onClick={() => setSelected(r)} 
+                        type="button"
+                    >
+                      {r.title}
+                    </button>
+                    <span className="text-xs text-slate-500">{r.lokasi}</span>
+                </div>
               )
             },
-            { key: 'lokasi', title: 'Lokasi', className: 'whitespace-nowrap' },
-            { key: 'upah', title: 'Upah', className: 'whitespace-nowrap' },
+            { 
+               key: 'upah', 
+               title: 'Upah', 
+               className: 'whitespace-nowrap font-medium text-slate-700' 
+            },
             {
               key: 'status',
               title: 'Status',
@@ -80,19 +103,30 @@ export default function Jobs() {
                 <Badge tone={r.status === 'Aktif' ? 'green' : r.status === 'Draf' ? 'amber' : 'slate'}>{r.status}</Badge>
               )
             },
-            { key: 'pelamar', title: 'Pelamar', className: 'whitespace-nowrap' },
-            { key: 'dibuat', title: 'Dibuat', className: 'whitespace-nowrap' },
+            { 
+               key: 'pelamar', 
+               title: 'Pelamar', 
+               className: 'whitespace-nowrap text-center',
+               render: (r) => (
+                  <div className="text-center">
+                     <span className="font-semibold">{r.pelamar}</span> <span className="text-xs text-slate-500">orang</span>
+                  </div>
+               )
+            },
+            { 
+               key: 'dibuat', 
+               title: 'Tanggal Dibuat', 
+               className: 'whitespace-nowrap text-xs text-slate-500',
+               render: (r) => r.dibuat
+            },
             {
               key: 'actions',
-              title: '',
+              title: <span className="block text-right pr-4">Opsi</span>,
               className: 'whitespace-nowrap text-right',
               render: (r) => (
                 <div className="flex justify-end gap-2">
-                  <button className="btn-secondary" type="button" onClick={() => setSelected(r)}>
+                  <button className="btn-secondary text-xs h-8 px-3" type="button" onClick={() => setSelected(r)}>
                     Detail
-                  </button>
-                  <button className="btn-secondary" type="button">
-                    Edit
                   </button>
                 </div>
               )
@@ -107,12 +141,12 @@ export default function Jobs() {
         title={selected ? `Detail Pekerjaan • ${selected.title}` : 'Detail'}
         onClose={() => setSelected(null)}
         footer={
-          <div className="flex gap-2 justify-end">
-            <button className="btn-secondary" onClick={() => setSelected(null)} type="button">
+          <div className="flex gap-3 justify-end w-full">
+            <button className="btn-secondary border-slate-200 text-slate-600 px-6 font-bold" onClick={() => setSelected(null)} type="button">
               Tutup
             </button>
-            <button className="btn-primary" type="button">
-              Simpan
+            <button className="btn-primary px-8 font-bold shadow-lg shadow-blue-500/20" type="button">
+              Simpan Perubahan
             </button>
           </div>
         }
@@ -145,50 +179,6 @@ export default function Jobs() {
             </div>
           </div>
         )}
-      </Modal>
-
-      <Modal
-        open={openCreate}
-        title="Buat Pekerjaan Baru"
-        onClose={() => setOpenCreate(false)}
-        footer={
-          <div className="flex gap-2 justify-end">
-            <button className="btn-secondary" onClick={() => setOpenCreate(false)} type="button">
-              Batal
-            </button>
-            <button className="btn-primary" type="button" onClick={() => setOpenCreate(false)}>
-              Simpan (dummy)
-            </button>
-          </div>
-        }
-      >
-        <div className="grid gap-3 text-sm">
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Judul</span>
-            <input className="input" placeholder="Contoh: Angkut material proyek 3 hari" />
-          </label>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-600">Lokasi</span>
-              <input className="input" placeholder="Contoh: Bekasi" />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-600">Upah</span>
-              <input className="input" placeholder="Contoh: Rp 180.000/hari" />
-            </label>
-          </div>
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Status</span>
-            <select className="input" defaultValue="Draf">
-              <option>Draf</option>
-              <option>Aktif</option>
-            </select>
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Deskripsi</span>
-            <textarea className="input min-h-[140px]" placeholder="Tulis detail pekerjaan..." />
-          </label>
-        </div>
       </Modal>
     </div>
   )

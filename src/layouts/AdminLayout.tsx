@@ -24,7 +24,7 @@ export default function AdminLayout() {
         </main>
         <footer className="px-4 sm:px-6 lg:px-8 pb-10 text-xs text-slate-500 flex items-center gap-2">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          © {new Date().getFullYear()} • Platform Buruh Harian Lepas • Village Edition
+          © {new Date().getFullYear()} • Job Contract Unified Interface • JobCoUi
         </footer>
       </div>
     </div>

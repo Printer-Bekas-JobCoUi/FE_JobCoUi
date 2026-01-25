@@ -12,7 +12,6 @@ import Jobs from "./pages/Jobs";
 import Contracts from "./pages/Contracts";
 import Payments from "./pages/Payments";
 import Ratings from "./pages/Ratings";
-import SocialFeed from "./pages/SocialFeed";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -43,7 +42,6 @@ export default function App() {
           <Route path="kontrak" element={<Contracts />} />
           <Route path="pembayaran" element={<Payments />} />
           <Route path="rating" element={<Ratings />} />
-          <Route path="feed" element={<SocialFeed />} />
           <Route path="pengaturan" element={<Settings />} />
         </Route>
 

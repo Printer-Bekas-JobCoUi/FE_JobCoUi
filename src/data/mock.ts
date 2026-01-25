@@ -180,7 +180,7 @@ export const workers: Worker[] = [
 export const employers: Employer[] = [
   {
     id: "E-2001",
-    name: "CV Maju Jaya",
+    name: "Budi Santoso",
     namaOrang: "Budi Santoso",
     bidang: "Konstruksi",
     email: "cv.majujaya@email.com",
@@ -192,7 +192,7 @@ export const employers: Employer[] = [
   },
   {
     id: "E-2002",
-    name: "Resto Sederhana",
+    name: "Ani Wijaya",
     namaOrang: "Ani Wijaya",
     bidang: "F&B",
     email: "resto.sederhana@email.com",
@@ -204,7 +204,7 @@ export const employers: Employer[] = [
   },
   {
     id: "E-2003",
-    name: "PT Bersih Sejahtera",
+    name: "Suharto Rahmat",
     namaOrang: "Suharto Rahmat",
     bidang: "Jasa Kebersihan",
     email: "pt.bersihsejahtera@email.com",
@@ -216,7 +216,7 @@ export const employers: Employer[] = [
   },
   {
     id: "E-2004",
-    name: "Toko Grosir Amanah",
+    name: "Rini Kusuma",
     namaOrang: "Rini Kusuma",
     bidang: "Ritel",
     email: "toko.amanah@email.com",
@@ -272,7 +272,7 @@ export const contracts: Contract[] = [
     id: "C-4001",
     jobTitle: "Bersih-bersih kantor 1 hari",
     worker: "Siti Nur Aini",
-    employer: "PT Bersih Sejahtera",
+    employer: "Suharto Rahmat",
     periode: "2026-01-06",
     upah: "Rp 200.000",
     status: "Aktif",
@@ -282,7 +282,7 @@ export const contracts: Contract[] = [
     id: "C-4002",
     jobTitle: "Angkut material proyek",
     worker: "Rudi Hartono",
-    employer: "CV Maju Jaya",
+    employer: "Budi Santoso",
     periode: "2026-01-04 → 2026-01-06",
     upah: "Rp 540.000",
     status: "Sengketa",
@@ -292,7 +292,7 @@ export const contracts: Contract[] = [
     id: "C-4003",
     jobTitle: "Bantu dapur catering (shift)",
     worker: "Maya Putri",
-    employer: "Resto Sederhana",
+    employer: "Ani Wijaya",
     periode: "2025-12-21",
     upah: "Rp 150.000",
     status: "Selesai",
@@ -304,7 +304,7 @@ export const payments: Payment[] = [
   {
     id: "P-5001",
     contractId: "C-4001",
-    payer: "PT Bersih Sejahtera",
+    payer: "Suharto Rahmat",
     payee: "Siti Nur Aini",
     amount: "Rp 200.000",
     method: "Escrow",
@@ -314,7 +314,7 @@ export const payments: Payment[] = [
   {
     id: "P-5002",
     contractId: "C-4003",
-    payer: "Resto Sederhana",
+    payer: "Ani Wijaya",
     payee: "Maya Putri",
     amount: "Rp 150.000",
     method: "Transfer",
@@ -324,7 +324,7 @@ export const payments: Payment[] = [
   {
     id: "P-5003",
     contractId: "C-4002",
-    payer: "CV Maju Jaya",
+    payer: "Budi Santoso",
     payee: "Rudi Hartono",
     amount: "Rp 540.000",
     method: "Escrow",
@@ -366,7 +366,7 @@ export const trainings: Training[] = [
 export const ratings: RatingEntry[] = [
   {
     id: "R-7001",
-    from: "PT Bersih Sejahtera",
+    from: "Suharto Rahmat",
     to: "Siti Nur Aini",
     role: "Buruh",
     score: 5,
@@ -377,7 +377,7 @@ export const ratings: RatingEntry[] = [
   {
     id: "R-7002",
     from: "Rudi Hartono",
-    to: "CV Maju Jaya",
+    to: "Budi Santoso",
     role: "Pemberi Kerja",
     score: 2,
     comment: "Pembayaran terlambat, perlu klarifikasi.",
@@ -386,7 +386,7 @@ export const ratings: RatingEntry[] = [
   },
   {
     id: "R-7003",
-    from: "Resto Sederhana",
+    from: "Ani Wijaya",
     to: "Maya Putri",
     role: "Buruh",
     score: 4,
@@ -408,7 +408,7 @@ export const feed: FeedPost[] = [
   },
   {
     id: "F-8002",
-    author: "CV Maju Jaya",
+    author: "Budi Santoso",
     role: "Pemberi Kerja",
     content:
       "Butuh tambahan tenaga untuk proyek 3 hari. Prioritas yang punya pengalaman.",

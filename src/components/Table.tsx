@@ -12,11 +12,15 @@ type Column<T> = {
 type TableProps<T extends Record<string, unknown>> = {
   columns: Column<T>[];
   rows: T[];
+  className?: string;
+  emptyText?: string; // Added emptyText prop
 };
 
 export default function Table<T extends Record<string, unknown>>({
   columns,
   rows,
+  className,
+  emptyText,
 }: TableProps<T>) {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
@@ -46,32 +50,28 @@ export default function Table<T extends Record<string, unknown>>({
   }, [rows, sortConfig]);
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-200">
-      <table className="w-full text-sm text-left">
-        <thead className="bg-slate-50 border-b border-slate-200">
-          <tr>
+    <div className={`overflow-x-auto rounded-xl border border-slate-200 bg-white ${className || ""}`}>
+      <table className="w-full text-sm text-left border-collapse">
+        <thead>
+          <tr className="bg-slate-50/50 border-b border-slate-200">
             {columns.map((col) => (
               <th
                 key={col.key}
-                className={`py-3 px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider group ${
-                  col.sortable ? "cursor-pointer select-none hover:bg-slate-100" : ""
+                className={`py-4 px-6 text-[11px] font-bold text-slate-500 uppercase tracking-wider group ${
+                  col.sortable ? "cursor-pointer select-none hover:bg-slate-100/50" : ""
                 } ${col.className ?? ""}`}
                 onClick={() => col.sortable && handleSort(col.key)}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-slate-600">
+                  <span>
                     {col.title}
                   </span>
                   {col.sortable && (
-                    <span className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      {sortConfig?.key === col.key ? (
-                        sortConfig.direction === "asc" ? (
-                          <ArrowUp className="h-3 w-3 text-emerald-600" />
-                        ) : (
-                          <ArrowDown className="h-3 w-3 text-emerald-600" />
-                        )
+                    <span className={`transition-opacity duration-200 ${sortConfig?.key === col.key ? 'opacity-100' : 'opacity-0 group-hover:opacity-40'}`}>
+                      {sortConfig?.key === col.key && sortConfig.direction === "desc" ? (
+                        <ArrowDown className="h-3 w-3" />
                       ) : (
-                        <ArrowUp className="h-3 w-3 text-slate-400" />
+                        <ArrowUp className="h-3 w-3" />
                       )}
                     </span>
                   )}
@@ -81,16 +81,16 @@ export default function Table<T extends Record<string, unknown>>({
           </tr>
         </thead>
         
-        <tbody className="divide-y divide-slate-100 bg-white">
+        <tbody className="divide-y divide-slate-100">
           {sortedRows.map((row, idx) => (
             <tr
               key={idx}
-              className="hover:bg-slate-50 transition-colors"
+              className="hover:bg-slate-50/80 transition-colors group"
             >
               {columns.map((col) => (
                 <td
                   key={col.key}
-                  className={`py-3 px-4 text-slate-700 ${
+                  className={`py-4 px-6 text-slate-600 font-medium ${
                     col.className ?? ""
                   }`}
                 >
@@ -105,17 +105,21 @@ export default function Table<T extends Record<string, unknown>>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="py-12 text-center text-slate-400"
+                className="py-16 text-center"
               >
-                <div className="flex flex-col items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-slate-50 flex items-center justify-center">
-                    <span className="text-2xl text-slate-300">📋</span>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="h-14 w-14 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100">
+                    <span className="text-3xl grayscale opacity-40">📋</span>
                   </div>
-                  <div className="font-medium text-slate-600">Tidak ada data</div>
+                  <div>
+                    <div className="font-bold text-slate-900">{emptyText || "Tidak ada data ditemukan"}</div>
+                    <p className="text-xs text-slate-400 mt-1">Coba sesuaikan filter atau tambahkan data baru</p>
+                  </div>
                 </div>
               </td>
             </tr>
           )}
+
         </tbody>
       </table>
     </div>

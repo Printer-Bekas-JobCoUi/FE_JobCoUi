@@ -36,11 +36,12 @@ export default function Login() {
         }`}
       >
         <div className={`w-full max-w-md space-y-8 transition-opacity duration-300 ${isSuccess ? 'opacity-0' : 'opacity-100'}`}>
-          <div className="text-center animate-fade-in flex justify-center mb-6">
-            <div className="h-32 w-32 bg-white rounded-full flex items-center justify-center p-4 border-4 border-slate-100 shadow-xl shadow-blue-900/5">
-              <img src="/jobcoui-logo.png" alt="JobCoUi Logo" className="h-full w-full object-contain" />
+          <div className="text-center">
+            <div className="animate-fade-in flex justify-center mb-6">
+              <div className="h-32 w-32 bg-white rounded-full flex items-center justify-center p-4 border-4 border-slate-100 shadow-xl shadow-blue-900/5 transition-transform hover:scale-105 duration-300">
+                <img src="/jobcoui-logo.png" alt="JobCoUi Logo" className="h-full w-full object-contain" />
+              </div>
             </div>
-          </div>
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">
               Selamat Datang Kembali
             </h1>
@@ -53,7 +54,7 @@ export default function Login() {
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 ml-1">Email</label>
               <input
-                className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 outline-none"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@example.com"
@@ -64,7 +65,7 @@ export default function Login() {
             <div className="space-y-2">
               <label className="text-sm font-semibold text-slate-700 ml-1">Password</label>
               <input
-                className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                className="w-full px-5 py-3.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 placeholder:text-slate-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all duration-300 outline-none"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 type="password"
@@ -75,18 +76,18 @@ export default function Login() {
 
             <div className="pt-4">
               <button
-                className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all duration-200 group ${
+                className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 active:scale-[0.98] transition-all duration-300 group ${
                   (isLoading || isSuccess) ? 'opacity-80 cursor-wait' : ''
                 }`}
                 type="button"
                 onClick={handleLogin}
                 disabled={isLoading || isSuccess}
               >
-                {isLoading || isSuccess ? (
+                {isLoading ? (
                    <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 ) : (
                   <>
-                    <Lock className="h-4 w-4 opacity-80" />
+                    <Lock className="h-4 w-4 opacity-80 group-hover:scale-110 transition-transform" />
                     Masuk ke Dashboard
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </>
@@ -98,6 +99,7 @@ export default function Login() {
               © 2026 JobCoUi • Platform Digital Buruh Harian
             </div>
           </div>
+        </div>
       </div>
 
 

@@ -11,12 +11,12 @@ type StatCardProps = {
 }
 
 const toneStyles = {
-  emerald: { bg: 'bg-emerald-50', text: 'text-emerald-600', hoverBg: 'group-hover:bg-emerald-100', border: 'hover:border-emerald-200' },
-  blue: { bg: 'bg-blue-50', text: 'text-blue-600', hoverBg: 'group-hover:bg-blue-100', border: 'hover:border-blue-200' },
-  purple: { bg: 'bg-purple-50', text: 'text-purple-600', hoverBg: 'group-hover:bg-purple-100', border: 'hover:border-purple-200' },
-  amber: { bg: 'bg-amber-50', text: 'text-amber-600', hoverBg: 'group-hover:bg-amber-100', border: 'hover:border-amber-200' },
-  rose: { bg: 'bg-rose-50', text: 'text-rose-600', hoverBg: 'group-hover:bg-rose-100', border: 'hover:border-rose-200' },
-  cyan: { bg: 'bg-cyan-50', text: 'text-cyan-600', hoverBg: 'group-hover:bg-cyan-100', border: 'hover:border-cyan-200' },
+  emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-600', iconBg: 'bg-emerald-500', shadow: 'shadow-emerald-200/50', border: 'border-emerald-100' },
+  blue: { bg: 'bg-blue-500/10', text: 'text-blue-600', iconBg: 'bg-blue-500', shadow: 'shadow-blue-200/50', border: 'border-blue-100' },
+  purple: { bg: 'bg-purple-500/10', text: 'text-purple-600', iconBg: 'bg-purple-500', shadow: 'shadow-purple-200/50', border: 'border-purple-100' },
+  amber: { bg: 'bg-amber-500/10', text: 'text-amber-600', iconBg: 'bg-amber-500', shadow: 'shadow-amber-200/50', border: 'border-amber-100' },
+  rose: { bg: 'bg-rose-500/10', text: 'text-rose-600', iconBg: 'bg-rose-500', shadow: 'shadow-rose-200/50', border: 'border-rose-100' },
+  cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-600', iconBg: 'bg-cyan-500', shadow: 'shadow-cyan-200/50', border: 'border-cyan-100' },
 }
 
 export default function StatCard({ title, value, hint, trend, icon, tone = 'emerald' }: StatCardProps) {
@@ -25,7 +25,6 @@ export default function StatCard({ title, value, hint, trend, icon, tone = 'emer
 
   const styles = toneStyles[tone]
 
-  // Animate counter on mount
   useEffect(() => {
     const duration = 1000
     const steps = 30
@@ -45,50 +44,40 @@ export default function StatCard({ title, value, hint, trend, icon, tone = 'emer
     return () => clearInterval(timer)
   }, [targetValue])
 
-  const displayValue = value.match(/\d/) ? count.toString() : value
+  const displayValue = value.match(/\d/) ? count.toLocaleString() : value
 
   return (
-    <div className={`card p-6 group cursor-pointer bg-white transition-colors duration-200 ${styles.border}`}>
-      <div className="flex items-start gap-4">
-        {/* Simple Icon Box */}
-        <div className={`h-10 w-10 rounded-lg ${styles.bg} ${styles.text} grid place-items-center transition-colors ${styles.hoverBg}`}>
+    <div className={`group relative overflow-hidden rounded-2xl border ${styles.border} bg-white p-6 transition-all duration-300 hover:shadow-lg hover:shadow-slate-200/50`}>
+      <div className="relative flex items-start justify-between">
+        <div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">{title}</p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <h3 className="text-3xl font-bold tracking-tight text-slate-900">{displayValue}</h3>
+            {hint && <span className="text-xs font-medium text-slate-400">/ {hint}</span>}
+          </div>
+        </div>
+
+        <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-colors duration-300 ${styles.bg} ${styles.text}`}>
           {icon}
         </div>
-        
-        <div className="min-w-0 flex-1">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
-            {title}
-          </div>
-          <div className="text-2xl font-bold text-slate-900 mt-1">
-            {displayValue}
-          </div>
-          {hint && (
-            <div className="text-xs text-slate-400 mt-1">
-              {hint}
-            </div>
-          )}
-        </div>
-        
-        <div className="ml-auto">
-          {trend && (
-            <span
-              className={[
-                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium',
-                trend.positive
-                  ? 'bg-emerald-100 text-emerald-700'
-                  : 'bg-red-100 text-red-700'
-              ].join(' ')}
-            >
-              {trend.positive ? (
-                <ArrowUpRight className="h-3 w-3" />
-              ) : (
-                <ArrowDownRight className="h-3 w-3" />
-              )}
-              {trend.value}
-            </span>
-          )}
-        </div>
       </div>
+
+      {trend && (
+        <div className="mt-4 flex items-center gap-1.5">
+          <div className={`flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold ${
+            trend.positive 
+              ? 'bg-emerald-50 text-emerald-600' 
+              : 'bg-red-50 text-red-600'
+          }`}>
+            {trend.positive ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+            {trend.value}
+          </div>
+          <span className="text-[10px] font-medium text-slate-400">vs bulan lalu</span>
+        </div>
+      )}
+      
+      {/* Subtle bottom accent */}
+      <div className={`absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-transparent via-current to-transparent opacity-20 transition-all duration-500 group-hover:w-full ${styles.text}`} />
     </div>
   )
 }

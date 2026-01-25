@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { Search, Filter, RefreshCcw, FileSpreadsheet } from 'lucide-react';
 import PageHeader from "../components/PageHeader";
 import Badge from "../components/Badge";
 import Table from "../components/Table";
@@ -27,49 +28,54 @@ export default function Workers() {
   }, [q, status]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <PageHeader
         title="Buruh"
-        description="Kelola proses verifikasi identitas pengguna, status, dan kepatuhan KYC."
+        description="Kelola proses verifikasi identitas, status akun, dan data pekerja."
         actions={
           <>
-            <button className="btn-secondary" type="button">
-              Impor Data
-            </button>
-            <button className="btn-primary" type="button">
-              Tambah
+            <button className="btn-primary flex items-center gap-2" type="button">
+              <FileSpreadsheet className="h-4 w-4" />
+              Ekspor Data (Excel)
             </button>
           </>
         }
       />
 
-      <div className="card p-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Cari</span>
+      <div className="card p-5">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+          <div className="relative flex-1 w-full text-slate-500 focus-within:text-blue-600 transition-colors">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
             <input
-              className="input"
+              className="input pl-10 bg-slate-50 border-slate-200 focus:bg-white"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Nama / ID / domisili / dokumen"
+              placeholder="Cari nama, ID, atau skill..."
             />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Status</span>
-            <select
-              className="input"
-              value={status}
-              onChange={(e) => setStatus(e.target.value as any)}
-            >
-              <option>Semua</option>
-              <option>Aktif</option>
-              <option>Diblokir</option>
-            </select>
-          </label>
-          <div className="flex items-end">
-            <button className="btn-secondary w-full" type="button">
-              Reset Filter
-            </button>
+          </div>
+          
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+             <div className="relative min-w-[140px]">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                <select
+                  className="input pl-9 bg-slate-50 border-slate-200"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as any)}
+                >
+                  <option>Semua</option>
+                  <option>Aktif</option>
+                  <option>Diblokir</option>
+                </select>
+             </div>
+             
+             <button 
+                className="btn-secondary px-3" 
+                type="button" 
+                onClick={() => { setQ(""); setStatus("Semua"); }}
+                title="Reset Filter"
+              >
+               <RefreshCcw className="h-4 w-4 text-slate-500" />
+             </button>
           </div>
         </div>
       </div>
@@ -77,62 +83,43 @@ export default function Workers() {
       <div className="card overflow-hidden">
         <Table
           columns={[
-            { key: "id", title: "ID", className: "whitespace-nowrap" },
+            { key: "id", title: "ID", className: "whitespace-nowrap font-mono text-xs text-slate-500" },
             {
               key: "name",
               title: "Nama",
               render: (r) => (
-                <button
-                  className="font-semibold hover:underline"
-                  onClick={() => setSelected(r)}
-                  type="button"
-                >
-                  {r.name}
-                </button>
+                <div className="flex items-center gap-3">
+                   {r.fotoUrl ? (
+                      <img src={r.fotoUrl} alt="" className="h-9 w-9 rounded-full object-cover bg-slate-100" />
+                   ) : (
+                      <div className="h-9 w-9 rounded-full bg-slate-100 flex items-center justify-center text-xs font-bold text-slate-500">
+                         {r.name.charAt(0)}
+                      </div>
+                   )}
+                   <div className="flex flex-col">
+                      <button
+                        className="font-semibold text-slate-900 hover:text-blue-600 hover:underline text-left"
+                        onClick={() => setSelected(r)}
+                        type="button"
+                      >
+                        {r.name}
+                      </button>
+                      <span className="text-xs text-slate-500">{r.verified}</span>
+                   </div>
+                </div>
               ),
             },
-            { key: "skill", title: "Skill", className: "whitespace-nowrap" },
+            { key: "skill", title: "Keahlian", className: "whitespace-nowrap font-medium text-slate-700" },
             {
-              key: "fotoUrl",
-              title: "Foto",
-              className: "whitespace-nowrap",
-              render: (r) =>
-                r.fotoUrl ? (
-                  <img
-                    src={r.fotoUrl}
-                    alt={r.name}
-                    className="h-10 w-10 object-cover rounded-full border"
-                  />
-                ) : (
-                  "-"
-                ),
-            },
-            {
-              key: "email",
-              title: "Email",
-              className: "whitespace-nowrap",
-              render: (r) => r.email || "-",
-            },
-            {
-              className: "whitespace-nowrap",
-              render: (r) =>
-                r.fotoKtpUrl ? (
-                  <img
-                    src={r.fotoKtpUrl}
-                    alt={r.name + " KTP"}
-                    className="h-10 w-16 object-cover rounded border"
-                  />
-                ) : (
-                  "-"
-                ),
-              key: "",
-              title: undefined,
-            },
-            {
-              key: "phone",
-              title: "No. Telepon",
-              className: "whitespace-nowrap",
-              render: (r) => r.phone || "-",
+              key: "contact",
+              title: "Kontak",
+              className: "whitespace-nowrap text-xs",
+              render: (r) => (
+                 <div className="flex flex-col">
+                    <span>{r.email  || "-"}</span>
+                    <span className="text-slate-400">{r.phone || "-"}</span>
+                 </div>
+              ),
             },
             {
               key: "domisili",
@@ -140,39 +127,18 @@ export default function Workers() {
               className: "whitespace-nowrap",
             },
             {
-              key: "verified",
-              title: "Status",
-              className: "whitespace-nowrap",
-              render: (r) => (
-                <Badge
-                  tone={r.verified === "Terverifikasi" ? "green" : "amber"}
-                >
-                  {r.verified}
-                </Badge>
-              ),
-            },
-            {
-              key: "tanggalVerifikasi",
-              title: "Tanggal Verifikasi",
-              className: "whitespace-nowrap",
-              render: (r) => r.tanggalVerifikasi || "-",
-            },
-            {
               key: "rating",
               title: "Rating",
               className: "whitespace-nowrap",
               render: (r) => (
-                <span className="font-semibold">{r.rating.toFixed(1)}</span>
+                <div className="flex items-center gap-1 font-semibold text-slate-700">
+                   <span className="text-amber-400">★</span> {r.rating.toFixed(1)}
+                </div>
               ),
             },
             {
-              key: "lastActive",
-              title: "Terakhir Aktif",
-              className: "whitespace-nowrap",
-            },
-            {
               key: "status",
-              title: "Status Akun",
+              title: "Status",
               className: "whitespace-nowrap",
               render: (r) => (
                 <Badge tone={r.status === "Aktif" ? "blue" : "rose"}>
@@ -182,12 +148,12 @@ export default function Workers() {
             },
             {
               key: "actions",
-              title: <span className="flex justify-center w-full">AKSI</span>,
-              className: "whitespace-nowrap text-center",
+              title: <span className="block text-right pr-4">Opsi</span>,
+              className: "whitespace-nowrap text-right",
               render: (r) => (
-                <div className="flex justify-center items-center gap-2 min-w-[220px]">
+                <div className="flex justify-end items-center gap-2">
                   <button
-                    className="btn-secondary text-xs h-7 px-3 leading-tight whitespace-nowrap flex-1"
+                    className="btn-secondary text-xs h-8 px-3"
                     type="button"
                     onClick={() => {
                       setSelected(r);
@@ -198,7 +164,7 @@ export default function Workers() {
                   </button>
                   {r.verified === "Belum" ? (
                     <button
-                      className="btn-primary text-xs h-7 px-3 leading-tight whitespace-nowrap flex-1"
+                      className="btn-primary text-xs h-8 px-3"
                       type="button"
                       onClick={() => {
                         setSelected({ ...r, verified: "Terverifikasi" });
@@ -210,14 +176,14 @@ export default function Workers() {
                     </button>
                   ) : (
                     <button
-                      className="btn-secondary text-xs h-7 px-3 leading-tight whitespace-nowrap flex-1"
+                      className="text-xs font-semibold text-blue-600 hover:text-blue-700 px-2"
                       type="button"
                       onClick={() => {
                         setSelected(r);
                         setModalMode("dokumen");
                       }}
                     >
-                      Lihat Dokumen
+                      Dokumen
                     </button>
                   )}
                 </div>
@@ -236,19 +202,19 @@ export default function Workers() {
           setModalMode(null);
         }}
         footer={
-          <div className="flex gap-2 justify-end">
+          <div className="flex gap-3 justify-end w-full">
             <button
-              className="btn-secondary"
+              className="btn-secondary border-slate-200 text-slate-600 px-6 font-bold"
               onClick={() => {
                 setSelected(null);
                 setModalMode(null);
               }}
               type="button"
             >
-              Tutup
+              Batalkan
             </button>
             <button
-              className="btn-primary"
+              className="btn-primary px-8 font-bold shadow-lg shadow-blue-500/20"
               type="button"
               onClick={() => {
                 if (selected) {

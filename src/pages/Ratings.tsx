@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react'
+import { Search, Filter, RefreshCcw } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Badge from '../components/Badge'
 import Table from '../components/Table'
@@ -17,7 +18,7 @@ export default function Ratings() {
   }, [q, status])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <PageHeader
         title="Rating & Apresiasi"
         description="Rating dua arah untuk membangun reputasi serta apresiasi kerja."
@@ -33,38 +34,62 @@ export default function Ratings() {
         }
       />
 
-      <div className="card p-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="grid gap-1 sm:col-span-2">
-            <span className="text-xs font-semibold text-slate-600">Cari</span>
-            <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="From / To / komentar / ID" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Status</span>
-            <select className="input" value={status} onChange={(e) => setStatus(e.target.value as any)}>
-              <option>Semua</option>
-              <option>Tampil</option>
-              <option>Perlu Moderasi</option>
-            </select>
-          </label>
+      <div className="card p-5">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+           <div className="relative flex-1 w-full text-slate-500 focus-within:text-blue-600 transition-colors">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
+            <input 
+              className="input pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-all outline-none" 
+              value={q} 
+              onChange={(e) => setQ(e.target.value)} 
+              placeholder="From / To / komentar / ID..." 
+            />
+          </div>
+          
+           <div className="flex items-center gap-2 w-full sm:w-auto">
+             <div className="relative min-w-[140px]">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                <select 
+                  className="input pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-all" 
+                  value={status} 
+                  onChange={(e) => setStatus(e.target.value as any)}
+                >
+                  <option>Semua</option>
+                  <option>Tampil</option>
+                  <option>Perlu Moderasi</option>
+                </select>
+            </div>
+            <button 
+                className="btn-secondary px-3" 
+                type="button" 
+                onClick={() => { setQ(""); setStatus("Semua"); }}
+                title="Reset Filter"
+              >
+               <RefreshCcw className="h-4 w-4 text-slate-500" />
+             </button>
+          </div>
         </div>
       </div>
 
-      <div className="card">
+      <div className="card overflow-hidden">
         <Table
           columns={[
-            { key: 'id', title: 'ID', className: 'whitespace-nowrap' },
-            { key: 'createdAt', title: 'Tanggal', className: 'whitespace-nowrap' },
-            { key: 'from', title: 'Dari' },
-            { key: 'to', title: 'Untuk' },
-            { key: 'role', title: 'Tipe', className: 'whitespace-nowrap' },
+            { key: 'id', title: 'ID', className: 'whitespace-nowrap font-mono text-xs text-slate-500' },
+            { key: 'createdAt', title: 'Tanggal', className: 'whitespace-nowrap text-xs text-slate-500' },
+            { key: 'from', title: 'Dari', render: (r) => <span className="font-semibold">{r.from}</span> },
+            { key: 'to', title: 'Untuk', render: (r) => <span className="font-semibold">{r.to}</span> },
+            { key: 'role', title: 'Tipe', className: 'whitespace-nowrap text-xs', render: (r) => <Badge tone="blue">{r.role}</Badge> },
             {
               key: 'score',
               title: 'Skor',
               className: 'whitespace-nowrap',
-              render: (r) => <span className="font-semibold">{r.score}/5</span>
+              render: (r) => (
+                 <div className="flex items-center gap-1">
+                    <span className="text-amber-400">★</span> <span className="font-bold">{r.score}</span>
+                 </div>
+              )
             },
-            { key: 'comment', title: 'Komentar' },
+            { key: 'comment', title: 'Komentar', className: 'italic text-slate-600' },
             {
               key: 'status',
               title: 'Status',
@@ -74,14 +99,11 @@ export default function Ratings() {
             {
               key: 'actions',
               title: '',
-              className: 'whitespace-nowrap text-right',
+              className: 'whitespace-nowrap text-right pr-4',
               render: (r) => (
                 <div className="flex justify-end gap-2">
-                  <button className="btn-secondary" type="button" onClick={() => setSelected(r)}>
+                  <button className="btn-secondary text-xs h-8 px-3" type="button" onClick={() => setSelected(r)}>
                     Review
-                  </button>
-                  <button className="btn-primary" type="button">
-                    Tampilkan
                   </button>
                 </div>
               )

@@ -29,7 +29,7 @@ export default function Settings() {
     {
       id: "role-4",
       name: "Moderator",
-      desc: "Moderasi rating & feed",
+      desc: "Moderasi rating",
       users: 2,
       status: "Aktif",
     },
@@ -52,22 +52,27 @@ export default function Settings() {
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="card p-5 lg:col-span-2">
-          <div className="text-sm font-semibold">Role & Hak Akses</div>
-          <div className="mt-4 card">
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="card lg:col-span-2">
+          <div className="p-6 border-b border-slate-100 mb-4">
+             <div className="text-sm font-bold text-slate-800">Role & Hak Akses</div>
+             <p className="text-xs text-slate-500 mt-1">Kelola akses pengguna ke modul sistem.</p>
+          </div>
+          
+          <div className="p-0">
             <Table
+              className="border-none shadow-none rounded-none"
               columns={[
                 {
                   key: "name",
                   title: "Role",
-                  className: "whitespace-nowrap",
+                  className: "whitespace-nowrap pl-6",
                   render: (r) => (
-                    <span className="font-semibold">{r.name}</span>
+                    <span className="font-semibold text-slate-700">{r.name}</span>
                   ),
                 },
-                { key: "desc", title: "Deskripsi" },
-                { key: "users", title: "User", className: "whitespace-nowrap" },
+                { key: "desc", title: "Deskripsi", className: "text-slate-600" },
+                { key: "users", title: "User", className: "whitespace-nowrap text-center", render:r=> <span className="bg-slate-100 px-2 py-1 rounded text-xs font-bold">{r.users}</span> },
                 {
                   key: "status",
                   title: "Status",
@@ -77,30 +82,30 @@ export default function Settings() {
                 {
                   key: "actions",
                   title: "",
-                  className: "whitespace-nowrap text-right",
+                  className: "whitespace-nowrap text-right pr-6",
                   render: () => (
                     <div className="flex justify-end gap-2">
-                      <button className="btn-secondary" type="button">
+                      <button className="btn-secondary text-xs h-8 px-3" type="button">
                         Edit
-                      </button>
-                      <button className="btn-secondary" type="button">
-                        Atur Permission
                       </button>
                     </div>
                   ),
                 },
               ]}
               rows={roles}
-              keyField="id"
             />
           </div>
         </div>
 
-        <div className="card p-5">
-          <div className="text-sm font-semibold">Preferensi UI</div>
-          <div className="mt-4 grid gap-3 text-sm">
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-600">
+        <div className="card h-fit">
+          <div className="p-6 border-b border-slate-100">
+             <div className="text-sm font-bold text-slate-800">Preferensi UI</div>
+             <p className="text-xs text-slate-500 mt-1">Pengaturan tampilan lokal.</p>
+          </div>
+          
+          <div className="p-6 grid gap-5 text-sm">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
                 Bahasa
               </span>
               <select className="input" defaultValue="id">
@@ -109,19 +114,22 @@ export default function Settings() {
               </select>
             </label>
 
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-600">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
                 Format Mata Uang
               </span>
               <select className="input" defaultValue="IDR">
                 <option value="IDR">IDR (Rupiah)</option>
                 <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
               </select>
             </label>
-
-            <button className="btn-primary" type="button">
-              Simpan Preferensi
-            </button>
+            
+            <div className="pt-2">
+                <button className="btn-primary w-full shadow-lg shadow-blue-500/20" type="button">
+                Simpan Preferensi
+                </button>
+            </div>
           </div>
         </div>
       </div>

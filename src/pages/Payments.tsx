@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react'
+import { Copy, Search, Filter, RefreshCcw } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Badge from '../components/Badge'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import { payments as seed, Payment, blockchainEvents } from '../data/mock'
-import { Copy } from 'lucide-react'
 
 export default function Payments() {
   const [q, setQ] = useState('')
@@ -23,10 +23,10 @@ export default function Payments() {
   }, [selected])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <PageHeader
         title="Upah & Pembayaran"
-        description="Transparansi upah dan alur pembayaran. (UI demo dengan data contoh)"
+        description="Transparansi upah, alur pembayaran, dan status penyelesaian."
         actions={
           <>
             <button className="btn-secondary" type="button">
@@ -39,92 +39,111 @@ export default function Payments() {
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        <div className="card p-5 lg:col-span-2">
-          <div className="flex items-center gap-2">
-            <div className="text-sm font-semibold">Daftar Pembayaran</div>
-            <Badge tone="blue">Kesepakatan digital</Badge>
-          </div>
-
-          <div className="mt-4 grid gap-3 sm:grid-cols-3">
-            <label className="grid gap-1 sm:col-span-2">
-              <span className="text-xs font-semibold text-slate-600">Cari</span>
-              <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ID / kontrak / pihak" />
-            </label>
-            <label className="grid gap-1">
-              <span className="text-xs font-semibold text-slate-600">Status</span>
-              <select className="input" value={status} onChange={(e) => setStatus(e.target.value as any)}>
-                <option>Semua</option>
-                <option>Menunggu</option>
-                <option>Berhasil</option>
-                <option>Gagal</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="mt-4 card">
-            <Table
-              columns={[
-                { key: 'id', title: 'ID', className: 'whitespace-nowrap' },
-                { key: 'contractId', title: 'Kontrak', className: 'whitespace-nowrap' },
-                { key: 'payer', title: 'Dari' },
-                { key: 'payee', title: 'Ke' },
-                { key: 'amount', title: 'Jumlah', className: 'whitespace-nowrap' },
-                { key: 'method', title: 'Metode', className: 'whitespace-nowrap' },
-                {
-                  key: 'status',
-                  title: 'Status',
-                  className: 'whitespace-nowrap',
-                  render: (r) => (
-                    <Badge tone={r.status === 'Berhasil' ? 'green' : r.status === 'Menunggu' ? 'amber' : 'rose'}>{r.status}</Badge>
-                  )
-                },
-                {
-                  key: 'actions',
-                  title: '',
-                  className: 'whitespace-nowrap text-right',
-                  render: (r) => (
-                    <div className="flex justify-end gap-2">
-                      <button className="btn-secondary" onClick={() => setSelected(r)} type="button">
-                        Detail
-                      </button>
-                      <button className="btn-primary" type="button">
-                        Verifikasi
-                      </button>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="card lg:col-span-2">
+            <div className="p-5 border-b border-slate-100 flex flex-col sm:flex-row items-end sm:items-center gap-4">
+                <div className="relative flex-1 w-full text-slate-500 focus-within:text-blue-600 transition-colors">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
+                    <input 
+                        className="input pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-all outline-none" 
+                        value={q} 
+                        onChange={(e) => setQ(e.target.value)} 
+                        placeholder="ID / kontrak / pihak..." 
+                    />
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                     <div className="relative min-w-[140px]">
+                        <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                        <select 
+                          className="input pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-all" 
+                          value={status} 
+                          onChange={(e) => setStatus(e.target.value as any)}
+                        >
+                          <option>Semua</option>
+                          <option>Menunggu</option>
+                          <option>Berhasil</option>
+                          <option>Gagal</option>
+                        </select>
                     </div>
-                  )
-                }
-              ]}
-              rows={rows}
-            />
-          </div>
+                </div>
+            </div>
+
+            <div className="p-0">
+                <Table
+                  className="border-none shadow-none rounded-none"
+                  columns={[
+                    { key: 'id', title: 'ID', className: 'whitespace-nowrap pl-6 font-mono text-xs text-slate-500' },
+                    { key: 'contractId', title: 'Kontrak', className: 'whitespace-nowrap text-xs text-slate-500' },
+                    { 
+                        key: 'payer', 
+                        title: 'Dari',
+                        render: (r) => <div className="font-semibold text-slate-700">{r.payer}</div>
+                    },
+                    { 
+                        key: 'payee', 
+                        title: 'Ke',
+                        render: (r) => <div className="font-semibold text-slate-700">{r.payee}</div>
+                    },
+                    { 
+                        key: 'amount', 
+                        title: 'Jumlah', 
+                        className: 'whitespace-nowrap font-medium text-slate-900',
+                    },
+                    { 
+                        key: 'status',
+                        title: 'Status',
+                        className: 'whitespace-nowrap',
+                        render: (r) => (
+                        <Badge tone={r.status === 'Berhasil' ? 'green' : r.status === 'Menunggu' ? 'amber' : 'rose'}>{r.status}</Badge>
+                        )
+                    },
+                    {
+                      key: 'actions',
+                      title: '',
+                      className: 'whitespace-nowrap text-right pr-6',
+                      render: (r) => (
+                        <div className="flex justify-end gap-2">
+                          <button className="btn-secondary text-xs h-8 px-3" onClick={() => setSelected(r)} type="button">
+                            Detail
+                          </button>
+                        </div>
+                      )
+                    }
+                  ]}
+                  rows={rows}
+                />
+            </div>
         </div>
 
-        <div className="card p-5">
-          <div className="text-sm font-semibold">Aturan Transparansi (UI)</div>
-          <div className="mt-3 text-sm text-slate-600 space-y-2 leading-5">
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <div className="font-semibold text-slate-900">1) Kesepakatan Upah</div>
-              <div className="mt-1">
-                Upah ditetapkan di awal (kontrak), lalu disimpan sebagai <span className="font-medium">record</span> yang
-                bisa ditampilkan kembali.
-              </div>
+        <div className="card h-fit">
+            <div className="p-5 border-b border-slate-100">
+                <div className="text-sm font-bold text-slate-800">Aturan Transparansi</div>
             </div>
+            <div className="p-5 text-sm text-slate-600 space-y-4 leading-relaxed">
+                <div className="flex gap-3">
+                    <div className="flex-shrink-0 mt-1 h-1.5 w-1.5 rounded-full bg-blue-500" />
+                    <div>
+                        <div className="font-semibold text-slate-900 text-xs uppercase tracking-wide mb-1">Kesepakatan Upah</div>
+                        Upah ditetapkan di awal (kontrak) dan disimpan sebagai <span className="font-medium text-slate-800">immutable record</span>.
+                    </div>
+                </div>
 
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <div className="font-semibold text-slate-900">2) Escrow (opsional)</div>
-              <div className="mt-1">
-                Dana dapat ditahan sementara untuk mengurangi risiko perselisihan pembayaran.
-              </div>
-            </div>
+                <div className="flex gap-3">
+                    <div className="flex-shrink-0 mt-1 h-1.5 w-1.5 rounded-full bg-amber-500" />
+                    <div>
+                        <div className="font-semibold text-slate-900 text-xs uppercase tracking-wide mb-1">Escrow</div>
+                        Dana dapat ditahan sementara (escrow) untuk mengurangi risiko sengketa.
+                    </div>
+                </div>
 
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-              <div className="font-semibold text-slate-900">3) Audit Blockchain (simulasi)</div>
-              <div className="mt-1">
-                UI menampilkan <span className="font-medium">txHash</span> dan status konfirmasi untuk transparansi.
-              </div>
+                <div className="flex gap-3">
+                    <div className="flex-shrink-0 mt-1 h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    <div>
+                        <div className="font-semibold text-slate-900 text-xs uppercase tracking-wide mb-1">Audit Trail</div>
+                        Setiap transaksi memiliki <span className="font-mono text-xs bg-slate-100 px-1 rounded">txHash</span> unik untuk verifikasi publik.
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
       </div>
 

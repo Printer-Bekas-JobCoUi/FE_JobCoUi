@@ -1,10 +1,10 @@
 import React, { useMemo, useState } from 'react'
+import { Copy, ExternalLink, Search, Filter, RefreshCcw } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Badge from '../components/Badge'
 import Table from '../components/Table'
 import Modal from '../components/Modal'
 import { blockchainEvents, Contract, contracts as seed } from '../data/mock'
-import { Copy, ExternalLink } from 'lucide-react'
 
 export default function Contracts() {
   const [q, setQ] = useState('')
@@ -24,55 +24,68 @@ export default function Contracts() {
   }, [selected])
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <PageHeader
         title="Kontrak Digital"
-        description="Kontrak sederhana yang terdokumentasi + bukti hash (simulasi keamanan)."
+        description="Pencatatan perjanjian kerja, bukti hash, dan status legalitas digital."
         actions={
           <>
-            <button className="btn-secondary" type="button">
-              Template Kontrak
-            </button>
-            <button className="btn-primary" type="button">
-              Buat Kontrak
-            </button>
           </>
         }
       />
 
-      <div className="card p-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Cari</span>
-            <input className="input" value={q} onChange={(e) => setQ(e.target.value)} placeholder="ID / pekerjaan / buruh / pemberi kerja" />
-          </label>
-          <label className="grid gap-1">
-            <span className="text-xs font-semibold text-slate-600">Status</span>
-            <select className="input" value={status} onChange={(e) => setStatus(e.target.value as any)}>
-              <option>Semua</option>
-              <option>Draft</option>
-              <option>Aktif</option>
-              <option>Selesai</option>
-              <option>Sengketa</option>
-            </select>
-          </label>
-          <div className="flex items-end">
-            <button className="btn-secondary w-full" type="button">
-              Reset Filter
-            </button>
+      <div className="card p-5">
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-4">
+           <div className="relative flex-1 w-full text-slate-500 focus-within:text-blue-600 transition-colors">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
+            <input 
+              className="input pl-10 bg-slate-50 border-slate-200 focus:bg-white transition-all outline-none" 
+              value={q} 
+              onChange={(e) => setQ(e.target.value)} 
+              placeholder="ID, Pekerjaan, atau Nama..." 
+            />
+          </div>
+          
+           <div className="flex items-center gap-2 w-full sm:w-auto">
+             <div className="relative min-w-[140px]">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-slate-500" />
+                <select 
+                  className="input pl-9 bg-slate-50 border-slate-200 focus:bg-white transition-all" 
+                  value={status} 
+                  onChange={(e) => setStatus(e.target.value as any)}
+                >
+                    <option>Semua</option>
+                    <option>Draft</option>
+                    <option>Aktif</option>
+                    <option>Selesai</option>
+                    <option>Sengketa</option>
+                </select>
+            </div>
+            <button 
+                className="btn-secondary px-3" 
+                type="button" 
+                onClick={() => { setQ(""); setStatus("Semua"); }}
+                title="Reset Filter"
+              >
+               <RefreshCcw className="h-4 w-4 text-slate-500" />
+             </button>
           </div>
         </div>
       </div>
 
-      <div className="card">
+      <div className="card overflow-hidden">
         <Table
           columns={[
-            { key: 'id', title: 'ID', className: 'whitespace-nowrap' },
-            { key: 'jobTitle', title: 'Pekerjaan' },
-            { key: 'worker', title: 'Buruh', className: 'whitespace-nowrap' },
-            { key: 'employer', title: 'Pemberi Kerja', className: 'whitespace-nowrap' },
-            { key: 'periode', title: 'Periode', className: 'whitespace-nowrap' },
-            { key: 'upah', title: 'Upah', className: 'whitespace-nowrap' },
+            { key: 'id', title: 'ID', className: 'whitespace-nowrap font-mono text-xs text-slate-500' },
+            { 
+               key: 'jobTitle', 
+               title: 'Pekerjaan',
+               render: (r) => <span className="font-semibold text-slate-700">{r.jobTitle}</span>
+            },
+            { key: 'worker', title: 'Buruh', className: 'whitespace-nowrap text-sm text-slate-600' },
+            { key: 'employer', title: 'Pemberi Kerja', className: 'whitespace-nowrap text-sm text-slate-600' },
+            { key: 'periode', title: 'Periode', className: 'whitespace-nowrap text-xs' },
+            { key: 'upah', title: 'Upah', className: 'whitespace-nowrap font-medium text-slate-900' },
             {
               key: 'status',
               title: 'Status',
@@ -83,18 +96,18 @@ export default function Contracts() {
                 </Badge>
               )
             },
-            { key: 'hash', title: 'Hash', className: 'whitespace-nowrap font-mono text-xs' },
+            { key: 'hash', title: 'Hash', className: 'whitespace-nowrap font-mono text-[10px] text-slate-400' },
             {
               key: 'actions',
               title: '',
-              className: 'whitespace-nowrap text-right',
+              className: 'whitespace-nowrap text-right pr-4',
               render: (r) => (
                 <div className="flex justify-end gap-2">
-                  <button className="btn-secondary" type="button" onClick={() => setSelected(r)}>
+                  <button className="btn-secondary text-xs h-8 px-3" type="button" onClick={() => setSelected(r)}>
                     Detail
                   </button>
                   <button
-                    className="btn-primary"
+                    className="btn-primary text-xs h-8 px-3"
                     type="button"
                     onClick={() => {
                       setSelected(r)
